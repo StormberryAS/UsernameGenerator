@@ -44,3 +44,5 @@ username 3 pt
 
 ## Credits
 Built by [Stormberry AS](https://stormberry.as). Proudly powered by sovereign AI agents.
+
+Data generation powered by [Deep-Translator](https://github.com/nidhaloff/deep-translator) (MIT License).
