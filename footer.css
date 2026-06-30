@@ -1,0 +1,209 @@
+/* App Switcher Marquee */
+.app-switcher-container {
+    padding: 3rem 0;
+    text-align: center;
+    margin-top: 2rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.switcher-title {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 1.5rem;
+}
+
+.app-switcher-marquee {
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+}
+
+.app-switcher-track {
+    display: flex;
+    width: max-content;
+    animation: scroll 40s linear infinite;
+}
+
+.app-switcher-container:hover .app-switcher-track {
+    animation-play-state: paused;
+}
+
+@keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.switcher-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-right: 1rem;
+}
+
+.switcher-card:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-2px);
+}
+
+/* Site Footer */
+.site-footer {
+    width: 100%;
+    padding: 4rem 1.5rem 2rem;
+    background: var(--bg-dark);
+    border-top: 1px solid var(--glass-border);
+    position: relative;
+    z-index: 10;
+}
+
+.footer-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.footer-brand {
+    max-width: 320px;
+}
+
+.footer-brand .footer-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+}
+
+.footer-dot {
+    background: linear-gradient(135deg, #E21E26, #FF4D54);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.footer-tagline {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.footer-powered p {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    text-align: right;
+    max-width: 250px;
+    line-height: 1.6;
+}
+
+.footer-powered a {
+    color: var(--accent-1);
+    text-decoration: none;
+}
+
+.footer-bottom {
+    max-width: 680px;
+    margin: 0 auto;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-social {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.footer-social a {
+    color: var(--text-muted);
+    transition: color 0.2s ease;
+}
+
+.footer-social a:hover {
+    color: var(--text-main);
+}
+
+.footer-privacy, .footer-ai {
+    margin-top: 0.25rem;
+    opacity: 0.7;
+}
+
+.footer-bottom a {
+    color: var(--text-muted);
+    text-decoration: underline;
+}
+
+/* CLI Guide */
+.cli-guide {
+    max-width: 600px;
+    margin: 3rem auto;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: left;
+    backdrop-filter: blur(16px);
+}
+
+.cli-guide h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.cli-guide p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.cli-guide pre {
+    background: rgba(0,0,0,0.4);
+    padding: 1rem;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: #10b981;
+    overflow-x: auto;
+}
+
+.contact-note {
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--text-muted);
+}
+.contact-note a {
+    color: var(--accent-1);
+    text-decoration: none;
+}
+.contact-note a:hover {
+    text-decoration: underline;
+}
