@@ -31,10 +31,19 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
+      # The runner ships an Android SDK, but not necessarily platform 37.1, and its
+      # bundled sdkmanager may be too old to know that package exists. Refresh
+      # cmdline-tools first, then install, and let the output show if it fails.
       - name: Install SDK packages the runner may not have
         run: |
-          yes | sdkmanager --licenses > /dev/null 2>&1 || true
-          sdkmanager "platforms;android-37.1" "build-tools;36.0.0" > /dev/null
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          [ -x "$SDKMANAGER" ] || SDKMANAGER="$(command -v sdkmanager)"
+          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+          "$SDKMANAGER" "cmdline-tools;latest" > /dev/null
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+          "$SDKMANAGER" "platforms;android-37.1" "build-tools;36.0.0"
 
       # The keystore is decoded into RUNNER_TEMP, which sits outside the workspace,
       # so no artifact glob or accidental `git add` can ever pick it up.
@@ -76,10 +85,12 @@ jobs:
       # Lets anyone prove this exact binary came out of this repo and this run:
       #   gh attestation verify app-release.apk -R StormberryAS/UsernameGenerator
       - uses: actions/attest-build-provenance@v4
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           subject-path: android/app/build/outputs/apk/release/app-release.apk
 
       - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
