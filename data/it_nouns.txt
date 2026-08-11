@@ -11,7 +11,6 @@ vincitore
 eroe
 maestro
 ispirazione
-meraviglia
 gemma
 diamante
 oro
@@ -72,8 +71,6 @@ luccichio
 trave
 raggio
 alba
-alba
-fiore
 fiore
 rosa
 giglio
@@ -90,7 +87,6 @@ saggezza
 verità
 onore
 coraggio
-coraggio
 forza
 energia
 magia
@@ -99,3 +95,6 @@ benedizione
 regalo
 fascino
 fortuna
+falco
+faro
+cometa

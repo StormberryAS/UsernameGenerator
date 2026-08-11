@@ -11,11 +11,9 @@ sieger
 held
 master
 inspiration
-wunder
 juwel
 diamant
 gold
-juwel
 adler
 löwe
 tiger
@@ -59,7 +57,6 @@ reise
 suche
 abenteuer
 gipfel
-gipfel
 berg
 ozean
 meer
@@ -69,7 +66,6 @@ blitz
 bolzen
 glänzen
 glitzern
-strahl
 strahl
 dämmerung
 sonnenaufgang
@@ -94,8 +90,11 @@ tapferkeit
 stärke
 leistung
 magie
-wunder
 segen
 geschenk
 charme
 glück
+falke
+komet
+saphir
+krone

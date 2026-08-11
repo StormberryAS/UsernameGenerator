@@ -15,7 +15,6 @@ mirare
 bijuterie
 diamant
 aur
-bijuterie
 vultur
 leu
 tigru
@@ -74,7 +73,6 @@ raza
 zori
 răsărit-de-soare
 floare
-floare
 trandafir
 crin
 lotus
@@ -99,3 +97,4 @@ binecuvântare
 cadou
 farmec
 noroc
+șoim

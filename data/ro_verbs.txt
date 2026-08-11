@@ -4,12 +4,9 @@ floare
 strălucire
 avânta
 prospera
-floare
 cuceri
 uimi
-prospera
 înflori
-strălucire
 triumf
 înălţa
 câştiga
@@ -41,7 +38,6 @@ farmec
 fascina
 captiva
 încânta
-uimi
 uimesc
 fior
 excita
@@ -68,9 +64,7 @@ stabiliza
 asigura
 consolida
 fortifica
-consolida
 impuls
-ridica
 ridica
 lift
 urca
@@ -83,7 +77,6 @@ evolua
 cresc
 dezvolta
 extinde
-amplifica
 amplifica
 multiplica
 crește
@@ -98,3 +91,10 @@ clarifica
 clar
 purifica
 curata
+zbura
+dansa
+cânta
+descoperi
+explora
+construi
+dărui

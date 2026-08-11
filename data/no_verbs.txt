@@ -3,12 +3,9 @@ inspirere
 blomstre
 skinne
 sveve
-blomstre
-blomstre
 erobre
 blende
 trives
-blomstre
 gløde
 triumf
 heving
@@ -42,7 +39,6 @@ fascinere
 fengsle
 fortrylle
 forbløffe
-forbløffe
 spenning
 begeistre
 stimulere
@@ -56,7 +52,6 @@ komfort
 berolige
 rolig
 slappe-av
-berolige
 forene
 koble-til
 bli-med
@@ -68,9 +63,7 @@ stabilisere
 sikker
 forsterke
 befeste
-forsterke
 øke
-heve
 heve
 løfte
 stige
@@ -84,11 +77,8 @@ vokse
 utvikle
 utvide
 forstørre
-forsterke
 multiplisere
-øke
 berike
-forbedre
 forbedre
 perfekt
 raffinere
@@ -97,4 +87,14 @@ lysere
 avklare
 klar
 rense
-rense
+seire
+skape
+bygge
+mestre
+våge
+feire
+juble
+danse
+synge
+funkle
+drømme

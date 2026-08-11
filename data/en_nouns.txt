@@ -68,7 +68,6 @@ thunder
 lightning
 bolt
 gleam
-glint
 beam
 ray
 dawn
@@ -88,7 +87,7 @@ grace
 beauty
 wisdom
 truth
-honor
+honour
 courage
 bravery
 strength

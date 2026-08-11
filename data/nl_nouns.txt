@@ -11,7 +11,6 @@ victor
 held
 meester
 inspiratie
-wonder
 juweeltje
 diamant
 goud
@@ -70,7 +69,6 @@ bout
 glans
 glinsteren
 straal
-straal
 ochtendgloren
 zonsopgang
 bloesem
@@ -90,12 +88,13 @@ wijsheid
 waarheid
 eer
 moed
-moed
 kracht
 stroom
 magie
-wonder
 zegening
 geschenk
 charme
 geluk
+vuurtoren
+kroon
+komeet

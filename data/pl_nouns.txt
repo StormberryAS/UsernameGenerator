@@ -15,7 +15,6 @@ zastanawiać-się
 klejnot
 diament
 złoto
-klejnot
 orzeł
 lew
 tygrys
@@ -59,7 +58,6 @@ podróż
 poszukiwanie
 przygoda
 szczyt
-szczyt
 góra
 ocean
 morze
@@ -73,7 +71,6 @@ belka
 promień
 świt
 wschód-słońca
-kwiat
 kwiat
 róża
 lilia
@@ -90,7 +87,6 @@ mądrość
 prawda
 honor
 odwaga
-odwaga
 wytrzymałość
 moc
 magia
@@ -99,3 +95,6 @@ błogosławieństwo
 prezent
 czar
 szczęście
+perła
+zorza
+sokół

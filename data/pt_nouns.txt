@@ -11,11 +11,9 @@ vencedor
 herói
 mestre
 inspiração
-maravilha
 jóia
 diamante
 ouro
-jóia
 águia
 leão
 tigre
@@ -68,9 +66,7 @@ trovão
 raio
 parafuso
 brilhar
-brilhar
 feixe
-raio
 alvorecer
 nascer-do-sol
 florescer
@@ -99,3 +95,6 @@ bênção
 presente
 charme
 sorte
+farol
+falcão
+horizonte

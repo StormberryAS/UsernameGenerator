@@ -11,7 +11,6 @@ victoris
 heros
 domini
 inspiratio
-admirari
 gem
 iaspis
 aurum
@@ -30,7 +29,6 @@ bellator
 titan
 rex
 regina
-princeps
 princeps
 dominus
 angelus
@@ -54,7 +52,6 @@ navis
 navigare
 circino
 map
-iter
 iter
 quest
 casus
@@ -99,3 +96,5 @@ benedictio
 donum
 lepos
 fortuna
+laurus
+delphinus

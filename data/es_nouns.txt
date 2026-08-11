@@ -15,7 +15,6 @@ preguntarse
 joya
 diamante
 oro
-joya
 águila
 león
 tigre
@@ -32,7 +31,6 @@ rey
 reina
 príncipe
 princesa
-caballero
 ángel
 espíritu
 alma
@@ -68,10 +66,8 @@ trueno
 iluminación
 tornillo
 destello
-destello
 haz
 rayo
-amanecer
 amanecer
 florecer
 flor
@@ -99,3 +95,6 @@ bendición
 regalo
 encanto
 suerte
+faro
+roble
+zafiro
