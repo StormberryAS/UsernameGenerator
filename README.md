@@ -3,9 +3,10 @@
 Secure, inspiring, and dynamic identity generation for the modern web. The UsernameGenerator is a self-hosted, highly customizable CLI utility and web application. Designed with a focus on positivity and cross-cultural reach, it algorithmically constructs memorable, high-impact usernames using curated dictionaries.
 
 **Live:** [username.stormberry.as](https://username.stormberry.as)
+**Android:** signed APK on the [Releases page](https://github.com/StormberryAS/UsernameGenerator/releases). Zero permissions, no network. Build and verification notes in [`android/README.md`](android/README.md).
 
 ## Features
-- **10 Supported Languages**: English (`en`), Portuguese (`pt`), Spanish (`es`), Norwegian (`no`), Latin (`la`), German (`de`), French (`fr`), Italian (`it`), Polish (`pl`), Dutch (`nl`).
+- **11 Supported Languages**: English (`en`), Portuguese (`pt`), Spanish (`es`), Norwegian (`no`), Latin (`la`), German (`de`), French (`fr`), Italian (`it`), Polish (`pl`), Dutch (`nl`), Romanian (`ro`).
 - **Empowering Lexicons**: Dictionaries are meticulously populated with exactly 100 exclusively positive, heroic, and inspiring words per category.
 - **Dynamic Phrasing**: Intelligently constructs complex structures (e.g., `Verb-Adjective-Noun`) or simple pairs depending on the requested length.
 - **Stateful Defaults**: Seamlessly persist your preferred CLI configuration via local config.
@@ -13,6 +14,7 @@ Secure, inspiring, and dynamic identity generation for the modern web. The Usern
 
 ## Architecture
 - **Vanilla HTML/CSS/JS** for the web interface, no frameworks, no build step.
+- **Native Android app** (`android/`), Kotlin and Jetpack Compose, sharing the same `data/` dictionaries at build time so web, CLI and app never drift apart. Declares **no Android permissions at all**: writing to the clipboard has never needed one, and there is no network access to request.
 - **Python CLI Engine** (`username.py`) serving as both the terminal utility and the core logic reference.
 - **Privacy first**, no cookies, no tracking. Fully local dictionary lookup.
 - Stormberry dark-mode glassmorphism design system, Inter typography.

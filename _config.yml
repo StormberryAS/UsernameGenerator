@@ -1,0 +1,10 @@
+# GitHub Pages serves the web app from the repository root. Everything below is
+# source or tooling that should not end up on username.stormberry.as.
+exclude:
+  - android/
+  - venv/
+  - build_dicts.py
+  - build_dicts_robust.py
+  - username.py
+  - README.md
+  - LICENSE

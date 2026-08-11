@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      This app declares NO permissions, on purpose.
+
+      Writing to the clipboard has never required a manifest permission on any
+      version of Android, so "copy" costs nothing here. Everything else runs on
+      bundled word lists, so there is no network, no storage and no device access.
+
+      The entries below are not permissions being requested. They are explicit
+      removals: if any dependency ever tries to merge INTERNET or network-state
+      into the merged manifest, the build strips it back out. Verify with:
+        ./gradlew :app:processReleaseMainManifest
+        cat app/build/intermediates/merged_manifests/release/**/AndroidManifest.xml
+    -->
+    <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
+
+    <!--
+      androidx.core declares a private signature permission for its
+      registerReceiver compatibility shim. It grants nothing to anyone but this
+      app, yet it still shows up in `aapt dump permissions` and in every APK
+      inspector, which muddies a "zero permissions" claim. This app registers no
+      broadcast receivers, so both halves of it are removed.
+    -->
+    <permission
+        android:name="${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        tools:node="remove" />
+    <uses-permission
+        android:name="${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        tools:node="remove" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.UsernameGenerator">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|density|fontScale"
+            android:theme="@style/Theme.UsernameGenerator">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

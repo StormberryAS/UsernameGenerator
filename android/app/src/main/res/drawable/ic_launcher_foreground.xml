@@ -1,0 +1,24 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Hexagon mark from the web app's favicon, inset into the adaptive-icon safe zone. -->
+    <path
+        android:pathData="M54,26L78,38V62L54,74L30,62V38L54,26Z">
+        <aapt:attr xmlns:aapt="http://schemas.android.com/aapt" name="android:fillColor">
+            <gradient
+                android:startX="54" android:startY="26"
+                android:endX="54" android:endY="74"
+                android:type="linear">
+                <item android:offset="0" android:color="#FF10B981" />
+                <item android:offset="1" android:color="#FF3B82F6" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:pathData="M54,41V59M45,45.5V54.5M63,45.5V54.5M39,50H40.5M67.5,50H69"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+</vector>
