@@ -8,12 +8,12 @@ vincere
 fulgore
 prosperum
 rutilans
-triumphum
+praevalere
 sublevo
 succedunt
 excel
 superare
-domini
+dirigere
 plumbum
 dux
 ditans
@@ -31,7 +31,7 @@ gratis
 expergiscimini
 illuminare
 delectatio
-lepos
+mulcere
 fascinare
 captare
 incantare
@@ -48,7 +48,7 @@ restituo
 recreantur
 consolatio
 lenire
-tranquillitas
+quiescere
 relaxat
 pacificare
 coniungere
@@ -69,7 +69,7 @@ attollere
 levare
 ascend
 scandere
-mons
+conscendere
 scalae
 surge
 emerge
@@ -83,7 +83,7 @@ multiplicare
 augere
 ditabo
 meliorem
-perfectus
+expolire
 refine
 nitorem
 perspicuus

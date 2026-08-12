@@ -113,7 +113,7 @@ def main():
             num_words = int(arg)
         elif arg in ["noun", "adjective", "verb", "mixed"]:
             word_type = arg
-        elif arg in ["en", "pt", "es", "no", "la", "de", "fr", "it", "pl", "nl"]:
+        elif arg in ["en", "pt", "es", "no", "la", "de", "fr", "it", "pl", "nl", "ro"]:
             lang = arg
         elif arg.startswith("separator:"):
             separator = arg.split("separator:", 1)[1]

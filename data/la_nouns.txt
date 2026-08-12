@@ -70,7 +70,7 @@ trabem
 ray
 aurora
 ortus-solis
-florere
+hortus
 flos
 rosa
 lilium

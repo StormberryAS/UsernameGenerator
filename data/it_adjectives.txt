@@ -63,7 +63,7 @@ immersione
 nuoto
 surf
 cavalcare
-guida
+instancabile
 navigazione
 planare
 crociera
@@ -71,7 +71,7 @@ alla-deriva
 vagabondaggio
 esplorando
 scoprire
-ricerca
+generoso
 trovare
 cercando
 epico

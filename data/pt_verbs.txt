@@ -7,13 +7,13 @@ conquistar
 deslumbrar
 prosperar
 brilho
-triunfo
+triunfar
 elevar
 ganhar
 ter-sucesso
 excel
 superar
-mestre
+ensinar
 liderar
 guia
 capacitar
@@ -33,7 +33,7 @@ despertar
 esclarecer
 iluminar
 prazer
-charme
+deleitar
 fascinar
 cativar
 encantar
@@ -49,7 +49,7 @@ restaurar
 rejuvenescer
 conforto
 acalmar
-calma
+serenar
 relaxar
 pacificar
 unir
@@ -82,10 +82,10 @@ multiplicar
 aumentar
 enriquecer
 melhorar
-perfeito
+aperfeiçoar
 refinar
 polonês
-claro
+clarear
 purificar
 limpar
 voar

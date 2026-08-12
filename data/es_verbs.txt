@@ -8,13 +8,13 @@ florecer
 conquistar
 deslumbrar
 brillo
-triunfo
+prevalecer
 edificación
 ganar
 tener-éxito
 sobresalir
 superar
-maestro
+enseñar
 dirigir
 guía
 autorizar
@@ -33,7 +33,7 @@ gratis
 despertar
 iluminar
 deleitar
-encanto
+compartir
 fascinar
 cautivar
 encantar
@@ -50,7 +50,7 @@ restaurar
 rejuvenecer
 comodidad
 calmar
-calma
+agradecer
 relajarse
 pacificar
 unir
@@ -78,11 +78,11 @@ amplificar
 multiplicar
 enriquecer
 mejorar
-perfecto
+culminar
 refinar
 polaco
 aclarar
-claro
+emprender
 purificar
 limpiar
 volar
