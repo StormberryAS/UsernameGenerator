@@ -103,7 +103,7 @@ git push origin android-v1.0.0
 
 - Dark theme only. The Stormberry palette has no light variant yet.
 - Recent generations live in memory for the session and are not written to disk. That is deliberate; a persisted list of the identities you generated is exactly the file you would not want on the device.
-- No unit or instrumentation tests yet. The engine is a direct port of `script.js` and `username.py`, and the sensible next step is a JVM test that runs the same dictionary through all three and asserts they agree.
+- Instrumentation tests are still absent. There ARE JVM unit tests (`./gradlew :app:testDebugUnitTest`) covering the sanitiser against the exact table `username.py` and `script.js` are also checked against, so the three implementations cannot silently drift apart. Generation itself is not yet covered, because it needs an `AssetManager`.
 
 ## Licence
 

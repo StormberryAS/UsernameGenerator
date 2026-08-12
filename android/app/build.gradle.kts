@@ -157,6 +157,8 @@ val copyDictionaries by tasks.registering(Copy::class) {
 tasks.named("preBuild") { dependsOn(copyDictionaries) }
 
 dependencies {
+    testImplementation(libs.junit)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

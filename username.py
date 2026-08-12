@@ -9,6 +9,32 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, "data")
 CONFIG_PATH = os.path.expanduser("~/.config/username_generator.json")
 
+# NFD decomposition plus combining-mark removal handles a-ring, c-cedilla, a-breve,
+# s-acute and the rest. It does NOT touch letters that have no decomposition at all:
+# they are single codepoints, not base plus accent. Without this map "drommer" keeps
+# its o-slash and "sokol" keeps its l-stroke, which defeats the whole point of
+# producing platform-agnostic usernames. Keep this table in sync with the identical
+# ones in script.js and android/.../UsernameEngine.kt.
+TRANSLITERATE = {
+    "\u00f8": "o",   # o with stroke, Norwegian/Danish
+    "\u0142": "l",   # l with stroke, Polish
+    "\u00df": "ss",  # sharp s, German
+    "\u00e6": "ae",  # ae ligature, Norwegian/Danish
+    "\u0153": "oe",  # oe ligature, French
+    "\u0111": "d",   # d with stroke
+    "\u00f0": "d",   # eth
+    "\u00fe": "th",  # thorn
+    "\u0131": "i",   # dotless i
+}
+
+
+def sanitize(value):
+    """Reduce a generated username to plain ASCII."""
+    value = ''.join(TRANSLITERATE.get(c, c) for c in value)
+    return ''.join(c for c in unicodedata.normalize('NFD', value)
+                   if unicodedata.category(c) != 'Mn')
+
+
 FALLBACK_CONFIG = {
     "num_words": 2,
     "word_type": "mixed",
@@ -68,7 +94,7 @@ def generate_username(num_words, word_type, lang, separator):
         for _ in range(num_words):
             result.append(random.choice(words_list))
     raw_username = separator.join(result)
-    return ''.join(c for c in unicodedata.normalize('NFD', raw_username) if unicodedata.category(c) != 'Mn')
+    return sanitize(raw_username)
 
 def main():
     config = load_config()

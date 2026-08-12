@@ -10,7 +10,7 @@ Secure, inspiring, and dynamic identity generation for the modern web. The Usern
 - **Empowering Lexicons**: Dictionaries are meticulously populated with exactly 100 exclusively positive, heroic, and inspiring words per category.
 - **Dynamic Phrasing**: Intelligently constructs complex structures (e.g., `Verb-Adjective-Noun`) or simple pairs depending on the requested length.
 - **Stateful Defaults**: Seamlessly persist your preferred CLI configuration via local config.
-- **Universal Compatibility**: Algorithmically strips accents and special characters (e.g., `condução` to `conducao`) to ensure platform-agnostic usernames.
+- **Universal Compatibility**: Algorithmically reduces every result to plain ASCII (`condução` to `conducao`, `drømme` to `dromme`, `sokół` to `sokol`, `großartig` to `grossartig`), so the username is accepted everywhere. Two steps are needed: Unicode NFD decomposition only reaches letters written as a base plus a combining accent, while `ø`, `ł`, `ß`, `æ` and `œ` are single codepoints and need an explicit transliteration table. That table is identical in all three implementations and is covered by tests.
 
 ## Architecture
 - **Vanilla HTML/CSS/JS** for the web interface, no frameworks, no build step.
@@ -22,7 +22,7 @@ Secure, inspiring, and dynamic identity generation for the modern web. The Usern
 
 ## Stack
 - [Deep-Translator](https://github.com/nidhaloff/deep-translator) for dictionary translation/population (build step only).
-- Python `unicodedata` and JS `String.prototype.normalize()` for string sanitization.
+- Python `unicodedata`, JS `String.prototype.normalize()` and Java `java.text.Normalizer` for string sanitisation, each paired with the same transliteration table.
 - [Inter](https://rsms.me/inter/) typeface, locally hosted.
 
 ## Local development

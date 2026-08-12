@@ -28,6 +28,29 @@ async function fetchDict(lang, type) {
     }
 }
 
+// NFD decomposition plus combining-mark removal handles a-ring, c-cedilla, a-breve,
+// s-acute and the rest. It does NOT touch letters that have no decomposition at all:
+// they are single codepoints, not base plus accent. Without this map "drommer" keeps
+// its o-slash and "sokol" keeps its l-stroke, which defeats the whole point of
+// producing platform-agnostic usernames. Keep this table in sync with the identical
+// ones in username.py and android/.../UsernameEngine.kt.
+const TRANSLITERATE = {
+    '\u00f8': 'o',   // o with stroke, Norwegian/Danish
+    '\u0142': 'l',   // l with stroke, Polish
+    '\u00df': 'ss',  // sharp s, German
+    '\u00e6': 'ae',  // ae ligature, Norwegian/Danish
+    '\u0153': 'oe',  // oe ligature, French
+    '\u0111': 'd',   // d with stroke
+    '\u00f0': 'd',   // eth
+    '\u00fe': 'th',  // thorn
+    '\u0131': 'i'    // dotless i
+};
+
+function sanitize(value) {
+    const mapped = Array.from(value).map(c => TRANSLITERATE[c] !== undefined ? TRANSLITERATE[c] : c).join('');
+    return mapped.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
 function getRandomWord(list) {
     return list[Math.floor(Math.random() * list.length)];
 }
@@ -70,8 +93,7 @@ async function generateUsername() {
         }
     }
 
-    let finalUsername = result.join(separator);
-    finalUsername = finalUsername.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+    let finalUsername = sanitize(result.join(separator));
     
     // Simulate slight delay for effect
     setTimeout(() => {

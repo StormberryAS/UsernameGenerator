@@ -19,6 +19,25 @@ object UsernameEngine {
     /** Combining diacritical marks, stripped after NFD decomposition. */
     private val combiningMarks = Regex("\\p{Mn}+")
 
+    /**
+     * Letters that NFD cannot help with, because they are single codepoints rather
+     * than a base plus a combining accent. Without this map "drommer" keeps its
+     * o-slash and "sokol" keeps its l-stroke, which defeats the point of producing
+     * usernames that any platform will accept. Keep in sync with the identical
+     * tables in username.py and script.js.
+     */
+    private val transliterate = mapOf(
+        '\u00f8' to "o",   // o with stroke, Norwegian/Danish
+        '\u0142' to "l",   // l with stroke, Polish
+        '\u00df' to "ss",  // sharp s, German
+        '\u00e6' to "ae",  // ae ligature, Norwegian/Danish
+        '\u0153' to "oe",  // oe ligature, French
+        '\u0111' to "d",   // d with stroke
+        '\u00f0' to "d",   // eth
+        '\u00fe' to "th",  // thorn
+        '\u0131' to "i",   // dotless i
+    )
+
     fun generate(
         dictionaries: Dictionaries,
         wordCount: Int,
@@ -62,11 +81,17 @@ object UsernameEngine {
         }
 
     /**
-     * Strips accents so the result is accepted everywhere: "conducao" not "condução".
-     * Matches the web app's NFD normalise plus combining-mark removal.
+     * Strips accents so the result is accepted everywhere: "conducao" not "condução",
+     * "drommer" not "drømmer", "sokol" not "sokół". Two steps, because NFD alone
+     * cannot reach letters that have no decomposition. Matches username.py and script.js.
      */
-    private fun sanitise(value: String): String =
-        combiningMarks.replace(Normalizer.normalize(value, Normalizer.Form.NFD), "")
+    /** Internal rather than private so the JVM parity test can reach it. */
+    internal fun sanitise(value: String): String {
+        val mapped = buildString(value.length) {
+            for (ch in value) append(transliterate[ch] ?: ch.toString())
+        }
+        return combiningMarks.replace(Normalizer.normalize(mapped, Normalizer.Form.NFD), "")
+    }
 
     private fun List<String>.random(): String = this[random.nextInt(size)]
 }
