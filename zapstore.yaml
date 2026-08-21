@@ -22,7 +22,7 @@ description: |
   network access, no storage access and nothing to phone home with. Check it
   yourself before installing:
 
-      aapt dump permissions UsernameGenerator-1.0.1.apk
+      aapt dump permissions UsernameGenerator-v1.0.1.apk
 
   The only line you should see is the package name.
 

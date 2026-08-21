@@ -5,7 +5,7 @@ The native Android build of [username.stormberry.as](https://username.stormberry
 **Zero permissions.** Not "only the clipboard permission": genuinely none. Writing to the clipboard has never required a manifest permission on any version of Android, and everything else runs on word lists compiled into the APK. You can check this yourself before you install:
 
 ```bash
-aapt dump permissions UsernameGenerator-1.0.1.apk
+aapt dump permissions UsernameGenerator-v1.0.1.apk
 ```
 
 The only line you should see is the package name. If anything else appears, do not install it.
@@ -17,7 +17,7 @@ The footer links to stormberry.as. That is a hand-off, not a network call: the a
 The app is not on Google Play. Download the APK from [Releases](https://github.com/StormberryAS/UsernameGenerator/releases), then either:
 
 - **On the phone:** tap the downloaded file. Android will ask you to allow installs from whichever app is doing the installing (browser or file manager). That toggle lives at *Settings, Apps, Special app access, Install unknown apps*. Play Protect may warn about an app it has not seen before; that is expected for a small independent release.
-- **Over USB:** `adb install UsernameGenerator-1.0.1.apk`. Cleaner, and it avoids the per-source permission entirely.
+- **Over USB:** `adb install UsernameGenerator-v1.0.1.apk`. Cleaner, and it avoids the per-source permission entirely.
 
 Requires Android 7.0 (API 24) or newer.
 
@@ -28,7 +28,7 @@ Two independent checks, and they answer different questions.
 **Who built it.** Every release is signed with the same key. The certificate fingerprint never changes, and Android itself enforces that continuity on every later update:
 
 ```bash
-apksigner verify --print-certs UsernameGenerator-1.0.1.apk
+apksigner verify --print-certs UsernameGenerator-v1.0.1.apk
 ```
 
 ```
@@ -41,7 +41,7 @@ Do not use `jarsigner` or `keytool -printcert -jarfile` for this. They only unde
 **Where it came from.** Releases are built by GitHub Actions and carry a provenance attestation, so you can confirm the binary came out of this repository rather than someone's laptop:
 
 ```bash
-gh attestation verify UsernameGenerator-1.0.1.apk -R StormberryAS/UsernameGenerator
+gh attestation verify UsernameGenerator-v1.0.1.apk -R StormberryAS/UsernameGenerator
 ```
 
 A `.sha256` file ships alongside each APK too, but be clear about what it buys: it proves the bytes you downloaded are the bytes that were uploaded. It does not prove authorship, because anyone who could swap the APK could swap the checksum next to it. The certificate and the attestation are the real anchors.
