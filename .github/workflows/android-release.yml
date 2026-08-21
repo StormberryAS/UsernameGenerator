@@ -67,13 +67,35 @@ jobs:
       - name: Verify signature and permissions
         run: |
           set -euo pipefail
-          BUILD_TOOLS=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
           APK=app/build/outputs/apk/release/app-release.apk
+
+          # Newest build-tools that actually carries what this step needs. Taking the
+          # highest version blindly is not safe: a partial download, or a release that
+          # drops the legacy aapt, would fail the build for a reason that has nothing
+          # to do with the APK.
+          BUILD_TOOLS=""
+          for d in $(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -Vr); do
+            if [ -x "$d/apksigner" ] && { [ -x "$d/aapt2" ] || [ -x "$d/aapt" ]; }; then
+              BUILD_TOOLS="${d%/}"
+              break
+            fi
+          done
+          if [ -z "$BUILD_TOOLS" ]; then
+            echo "::error::no build-tools install carries both apksigner and aapt/aapt2"
+            ls -d "$ANDROID_HOME"/build-tools/*/ || true
+            exit 1
+          fi
+          echo "Using $BUILD_TOOLS"
+
           "$BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK"
-          PERMS=$("$BUILD_TOOLS/aapt" dump permissions "$APK" | grep -c "uses-permission" || true)
+
+          # aapt2 prints the same "uses-permission: name='...'" lines as aapt v1.
+          AAPT="$BUILD_TOOLS/aapt2"
+          [ -x "$AAPT" ] || AAPT="$BUILD_TOOLS/aapt"
+          PERMS=$("$AAPT" dump permissions "$APK" | grep -c "uses-permission" || true)
           if [ "$PERMS" -ne 0 ]; then
             echo "::error::APK declares $PERMS permission(s); this app must declare none."
-            "$BUILD_TOOLS/aapt" dump permissions "$APK"
+            "$AAPT" dump permissions "$APK"
             exit 1
           fi
           echo "Verified: zero permissions."
