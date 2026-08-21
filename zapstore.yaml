@@ -1,0 +1,63 @@
+# Zapstore publishing manifest (https://zapstore.dev/docs/publish).
+#
+# `pubkey` is load-bearing, not decoration: on a first publish the Zapstore relay
+# fetches this file from the repository and whitelists the key it finds here, so
+# it must stay identical to the key `zsp` signs with (SIGN_WITH). It is the
+# Stormberry AS nostr identity, the same one behind nostr.json at stormberry.as.
+#
+# Publish a release with:
+#   SIGN_WITH=<nsec|bunker://...> zsp publish zapstore.yaml
+repository: https://github.com/StormberryAS/UsernameGenerator
+pubkey: npub1zz9w77p2jkn95t0st9tcuea8zdn2vknf0ctrwyd4g46w3kswdccqesr0pa
+
+name: UsernameGenerator
+summary: Memorable usernames in 11 languages, generated on your device
+description: |
+  UsernameGenerator builds memorable usernames from curated word lists in 11
+  languages: English, Norsk, Português, Español, Deutsch, Français, Italiano,
+  Nederlands, Polski, Română and Latina.
+
+  It declares no Android permissions at all. Not "only the clipboard": genuinely
+  none. Everything runs on word lists compiled into the APK, so there is no
+  network access, no storage access and nothing to phone home with. Check it
+  yourself before installing:
+
+      aapt dump permissions UsernameGenerator-1.0.1.apk
+
+  The only line you should see is the package name.
+
+  - Choose 1 to 5 words, mixed or adjectives / nouns / verbs only, and a
+    separator of none, hyphen, underscore or full stop.
+  - Accents are stripped after generation, so "condução" becomes "conducao" and
+    the result is accepted everywhere.
+  - Randomness comes from SecureRandom, not a predictable PRNG. People generate
+    usernames to keep identities apart, and that only works if the next one is
+    not guessable from the last.
+  - Recent generations are kept in memory for the session and never written to
+    disk. A saved list of the identities you generated is exactly the file you
+    would not want on the device.
+
+  The same engine also runs on the web at username.stormberry.as and as a Python
+  CLI in the repository. All three produce the same shapes from the same
+  dictionaries.
+
+tags:
+  - privacy
+  - utilities
+  - username
+  - offline
+  - generator
+
+license: MIT
+website: https://username.stormberry.as
+
+# Captured on an API 36 emulator at 1080x2400. zsp uploads these to Blossom and
+# references them from the kind 32267 app event.
+images:
+  - ./android/screenshots/01-generate.png
+  - ./android/screenshots/02-recent.png
+
+# No release_source: zsp pulls the APK straight from the GitHub release, so the
+# asset URL in the nostr event points at the same signed binary the release page
+# serves and the attestation covers. The pattern keeps it off the .sha256 file.
+match: "UsernameGenerator-.*\\.apk$"

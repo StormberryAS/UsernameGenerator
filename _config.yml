@@ -8,3 +8,4 @@ exclude:
   - username.py
   - README.md
   - LICENSE
+  - zapstore.yaml
