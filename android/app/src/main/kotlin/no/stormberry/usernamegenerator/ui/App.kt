@@ -1,14 +1,17 @@
 package no.stormberry.usernamegenerator.ui
 
+import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.PersistableBundle
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,6 +28,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -50,6 +54,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -57,9 +62,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import no.stormberry.usernamegenerator.Dictionaries
@@ -71,6 +79,10 @@ import no.stormberry.usernamegenerator.UsernameEngine
 import no.stormberry.usernamegenerator.WordType
 
 private const val HISTORY_LIMIT = 12
+
+/** Where both footer links go. */
+private const val STORMBERRY_URL = "https://stormberry.as"
+private const val OPEN_LINK_LABEL = "Open stormberry.as"
 
 @Composable
 fun UsernameGeneratorApp(modifier: Modifier = Modifier) {
@@ -232,7 +244,11 @@ fun UsernameGeneratorApp(modifier: Modifier = Modifier) {
             }
 
             Spacer(Modifier.height(28.dp))
-            Footer()
+            Footer(
+                onLinkUnopenable = {
+                    scope.launch { snackbarHostState.showSnackbar("No app available to open stormberry.as") }
+                },
+            )
         }
 
         SnackbarHost(
@@ -250,19 +266,33 @@ fun UsernameGeneratorApp(modifier: Modifier = Modifier) {
 
 @Composable
 private fun Header() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = "UsernameGenerator",
-            style = MaterialTheme.typography.headlineMedium,
-            color = Stormberry.TextMain,
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Image(
+            painter = painterResource(R.drawable.ic_app_logo),
+            // Decorative: the title sitting right beside it already says the name,
+            // so announcing it twice would only slow a screen reader down.
+            contentDescription = null,
+            modifier = Modifier
+                .size(46.dp)
+                .drawBehind { drawLogoGlow() },
         )
-        Spacer(Modifier.height(6.dp))
-        Text(
-            text = "Memorable identities, generated on your device",
-            style = MaterialTheme.typography.bodyMedium,
-            color = Stormberry.TextMuted,
-            textAlign = TextAlign.Center,
-        )
+        Spacer(Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "UsernameGenerator",
+                style = MaterialTheme.typography.headlineSmall,
+                color = Stormberry.TextMain,
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = "Memorable identities, generated on your device",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Stormberry.TextMuted,
+            )
+        }
     }
 }
 
@@ -408,7 +438,8 @@ private fun HistorySection(history: List<String>, onCopy: (String) -> Unit) {
 }
 
 @Composable
-private fun Footer() {
+private fun Footer(onLinkUnopenable: () -> Unit) {
+    val context = LocalContext.current
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = "No permissions. No network. No tracking.",
@@ -416,12 +447,42 @@ private fun Footer() {
             color = Stormberry.TextMuted,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = "Stormberry AS",
-            style = MaterialTheme.typography.bodySmall,
-            color = Stormberry.GlassBorder,
-        )
+        // The company line and the lockup are one control, not two. They go to the
+        // same place, and the lockup's wordmark says "Stormberry" again, so as two
+        // adjacent nodes a screen reader would read the same link twice. Clickable
+        // merges the semantics of what it wraps, so this announces once.
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .clickable(
+                    role = Role.Button,
+                    onClickLabel = OPEN_LINK_LABEL,
+                ) { openStormberry(context, onLinkUnopenable) }
+                // Padding sits inside the clickable, so it is tap target and not
+                // just spacing, and it doubles as the gap under the line above.
+                .padding(horizontal = 16.dp, vertical = 16.dp),
+        ) {
+            Text(
+                text = "Stormberry AS",
+                style = MaterialTheme.typography.bodySmall,
+                // Same muted grey as the line above it. The old GlassBorder white at
+                // 8% came out at 1.2:1 against this background, effectively invisible.
+                color = Stormberry.TextMuted,
+                textDecoration = TextDecoration.Underline,
+            )
+            Spacer(Modifier.height(16.dp))
+            Image(
+                painter = painterResource(R.drawable.ic_stormberry_logo),
+                // Decorative: the line above it is the accessible name for this link.
+                contentDescription = null,
+                // Full white would out-shout the app's own content this far down.
+                alpha = 0.72f,
+                // Height only: the drawable carries the lockup's proportions, so the
+                // width follows from them and never has to be kept in sync.
+                modifier = Modifier.height(26.dp),
+            )
+        }
     }
 }
 
@@ -445,6 +506,40 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawOrbs() {
     orb(Stormberry.AccentIndigo, Offset(size.width * 0.05f, size.height * 0.08f), size.minDimension * 0.85f)
     orb(Stormberry.AccentRose, Offset(size.width * 0.95f, size.height * 0.78f), size.minDimension * 0.95f)
     orb(Stormberry.AccentSky, Offset(size.width * 0.80f, size.height * 0.18f), size.minDimension * 0.60f)
+}
+
+/**
+ * The indigo halo the web app puts behind the same mark with a CSS drop-shadow.
+ * Drawn as a radial gradient rather than Modifier.blur, which needs API 31, and
+ * deliberately not clipped so it spills past the mark the way a glow should.
+ */
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawLogoGlow() {
+    val radius = size.minDimension * 0.95f
+    drawCircle(
+        brush = Brush.radialGradient(
+            colors = listOf(Stormberry.AccentIndigo.copy(alpha = 0.42f), Color.Transparent),
+            center = center,
+            radius = radius,
+        ),
+        radius = radius,
+        center = center,
+    )
+}
+
+/**
+ * Hands the URL to whatever browser the user already has.
+ *
+ * This is not the app going online. There is no INTERNET permission here, the
+ * manifest still strips it, and nothing is fetched in this process: the intent
+ * names an address and another app decides what to do with it. A device with no
+ * browser at all is rare but real, so the failure is reported rather than thrown.
+ */
+private fun openStormberry(context: Context, onUnopenable: () -> Unit) {
+    try {
+        context.startActivity(Intent(Intent.ACTION_VIEW, STORMBERRY_URL.toUri()))
+    } catch (_: ActivityNotFoundException) {
+        onUnopenable()
+    }
 }
 
 /**

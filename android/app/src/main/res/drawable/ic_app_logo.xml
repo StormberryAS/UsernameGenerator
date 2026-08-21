@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The UsernameGenerator mark, the same hexagon the web app serves as favicon.svg,
+  at its full 64-unit viewport rather than inset into the adaptive-icon safe zone
+  the way ic_launcher_foreground.xml has to be. Verified to rasterise identically
+  to favicon.svg, pixel for pixel, at 512px.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <path android:pathData="M32,0L64,16V48L32,64L0,48V16L32,0Z">
+        <aapt:attr xmlns:aapt="http://schemas.android.com/aapt" name="android:fillColor">
+            <gradient
+                android:startX="32" android:startY="0"
+                android:endX="32" android:endY="64"
+                android:type="linear">
+                <item android:offset="0" android:color="#FF10B981" />
+                <item android:offset="1" android:color="#FF3B82F6" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:pathData="M32,20V44M22,26V38M42,26V38M14,32H18M46,32H50"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round" />
+</vector>

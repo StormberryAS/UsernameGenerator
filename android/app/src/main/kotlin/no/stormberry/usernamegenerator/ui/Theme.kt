@@ -48,7 +48,7 @@ private val StormberryColors = darkColorScheme(
 private val StormberryTypography = Typography().run {
     copy(
         displaySmall = displaySmall.copy(fontWeight = FontWeight.Bold, letterSpacing = (-0.5).sp),
-        headlineMedium = headlineMedium.copy(fontWeight = FontWeight.Bold),
+        headlineSmall = headlineSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = (-0.5).sp),
         titleMedium = titleMedium.copy(fontWeight = FontWeight.SemiBold),
         labelLarge = labelLarge.copy(fontWeight = FontWeight.Medium),
     )
