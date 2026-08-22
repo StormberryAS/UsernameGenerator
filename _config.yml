@@ -9,3 +9,11 @@ exclude:
   - README.md
   - LICENSE
   - zapstore.yaml
+  - fastlane/
+  - tools/
+  - NOTICE
+  - DISCLAIMER.md
+
+# data/ is deliberately NOT excluded: script.js fetches data/<lang>_<cat>.txt and
+# data/entropy-model.tsv from the live site at runtime, so excluding it would 404
+# every dictionary and leave the generator serving its fallback word forever.

@@ -35,6 +35,17 @@
                     </button>
                 </div>
 
+                <!-- aria-live polite: the figures change as the controls move, and a
+                     screen reader should hear the new ones without being interrupted
+                     mid-sentence every time a number field ticks. -->
+                <div class="strength" id="strength" aria-live="polite">
+                    <span class="strength-bits" id="strengthBits">&#8212;</span>
+                    <span class="strength-detail" id="strengthDetail"></span>
+                    <button type="button" class="max-entropy-btn" id="maxEntropyBtn"
+                            title="Apply the strongest available settings">Max entropy</button>
+                    <span class="max-hint" id="maxHint"></span>
+                </div>
+
                 <div class="controls">
                     <div class="control-group">
                         <label for="words">Words</label>
@@ -52,10 +63,28 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="lang">Language</label>
+                        <label for="lang">Language
+                            <!-- Hover/focus tooltip rather than always-visible text: the
+                                 warning only applies to one of the thirteen options, and
+                                 printing it permanently would attach it to all of them. -->
+                            <span class="hint" tabindex="0" role="note"
+                                  aria-label="Word lists are checked in their own language only, so a name
+                                              may read badly in another language. Mixing makes that
+                                              more likely.">*
+                                <span class="hint-bubble">Every word list is checked by a native
+                                    speaker of its own language only, so any name may
+                                    contain a word that means something unfortunate in
+                                    another language. Mixing makes that more likely,
+                                    because it draws each word from the combined
+                                    vocabulary of all eleven. Generate again if you do
+                                    not like what you get.</span>
+                            </span>
+                        </label>
                         <select id="lang">
+                            <option value="random" selected>Random language</option>
+                            <option value="mix">Mix languages *</option>
                             <option value="nl">Dutch</option>
-                            <option value="en" selected>English (UK)</option>
+                            <option value="en">English (UK)</option>
                             <option value="fr">French</option>
                             <option value="de">German</option>
                             <option value="it">Italian</option>
@@ -69,8 +98,31 @@
                     </div>
 
                     <div class="control-group">
+                        <label class="switch-label" for="digits">
+                            <input type="checkbox" id="digits" checked />
+                            <span>Add digits to each word</span>
+                        </label>
+                        <small class="hint">More combinations, and it keeps words readable when the separator is "none".</small>
+                    </div>
+
+                    <div class="control-group digit-option">
+                        <label for="digitPosition">Digit position</label>
+                        <select id="digitPosition">
+                            <option value="after" selected>After the word</option>
+                            <option value="before">Before the word</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group digit-option">
+                        <label for="digitCount">Digits per word</label>
+                        <input type="number" id="digitCount" min="1" max="5" value="1">
+                    </div>
+
+                    <div class="control-group">
                         <label for="separator">Separator</label>
                         <select id="separator">
+                            <option value="random">Random (same throughout)</option>
+                            <option value="mix">Mix (any)</option>
                             <option value="-">Hyphen (-)</option>
                             <option value="_">Underscore (_)</option>
                             <option value=".">Dot (.)</option>

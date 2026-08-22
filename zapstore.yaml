@@ -51,6 +51,15 @@ tags:
 license: MIT
 website: https://username.stormberry.as
 
+# The APK ships NO raster icon: vectorDrawables.generatedDensities() is empty and
+# the launcher icon is an adaptive-icon XML, because generated density PNGs are a
+# source of build nondeterminism. Android renders that fine, but a store front-end
+# looks for a bitmap, finds res/BW.xml and shows an empty tile, which is exactly
+# what Zapstore was displaying. So the icon is supplied here instead, generated
+# from favicon.svg by tools/build-store-icon.py at the same inset the launcher
+# uses. The same file also lives in fastlane/ for F-Droid.
+icon: ./fastlane/metadata/android/en-US/images/icon.png
+
 # Captured on an API 36 emulator at 1080x2400. zsp uploads these to Blossom and
 # references them from the kind 32267 app event.
 images:

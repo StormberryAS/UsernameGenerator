@@ -1,0 +1,26 @@
+UsernameGenerator builds memorable usernames from curated word lists in 11
+languages: English, Norsk, Portugues, Espanol, Deutsch, Francais, Italiano,
+Nederlands, Polski, Romana and Latina.
+
+It declares no Android permissions at all. Not "only the clipboard": genuinely
+none. Everything runs on word lists compiled into the APK, so there is no
+network access, no storage access and nothing to phone home with. Check it
+yourself before installing:
+
+    aapt dump permissions UsernameGenerator-v1.0.1.apk
+
+The only line you should see is the package name.
+
+- Choose 1 to 5 words, mixed or adjectives / nouns / verbs only, and a
+  separator of none, hyphen, underscore or full stop.
+- Accents are stripped after generation, so "conducao" is accepted everywhere.
+- Randomness comes from SecureRandom, not a predictable PRNG. People generate
+  usernames to keep identities apart, and that only works if the next one is
+  not guessable from the last.
+- Recent generations are kept in memory for the session and never written to
+  disk. A saved list of the identities you generated is exactly the file you
+  would not want on the device.
+
+The same engine also runs on the web at username.stormberry.as and as a Python
+CLI in the repository. All three produce the same shapes from the same
+dictionaries.

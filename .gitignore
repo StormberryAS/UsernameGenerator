@@ -1,0 +1,31 @@
+# Python virtual environment
+.venv/
+venv/
+ENV/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Android / Gradle build output
+android/build/
+android/app/build/
+android/.gradle/
+android/local.properties
+android/.kotlin/
+*.apk
+*.aab
+*.jks
+android/keystore.properties
+
+# Generated assets. Both are COPIES made at build time by the copyDictionaries
+# Gradle task from data/ at the repo root, which is the source of truth. Committing
+# them would give the repo two versions of the same word lists, free to disagree.
+android/app/src/main/assets/data/
+
+# Editor and OS noise
+.idea/
+.DS_Store
+*.swp

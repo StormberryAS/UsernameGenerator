@@ -238,6 +238,17 @@ select option {
     color: #fff;
 }
 
+/* Digit position and count are dimmed, not hidden, while digits are off. Hiding a
+   cell would collapse it out of the two-column grid and shift every later control
+   under the pointer, so the layout stays put and the controls just read as inert. */
+.control-group.is-disabled {
+    opacity: 0.4;
+}
+
+input:disabled, select:disabled {
+    cursor: not-allowed;
+}
+
 /* Generate Button */
 .generate-btn {
     width: 100%;
@@ -291,3 +302,116 @@ select option {
         gap: 1rem;
     }
 }
+
+/* Strength readout ---------------------------------------------------------
+   Sits between the username and the controls because it is a consequence of the
+   controls and a property of the username, and reads as neither if it is put
+   below the Generate button. Deliberately quiet: it is a fact about the current
+   settings, not a verdict on them, and nothing here is colour-coded green or
+   red because "strong" is a judgement this app has no business making about a
+   username, which is not a password. */
+.strength {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+    margin: -4px 0 20px;
+    text-align: center;
+}
+
+.strength-bits {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--accent-3);
+    letter-spacing: 0.01em;
+}
+
+.strength-detail {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.5;
+}
+
+/* The two figures are one sentence on a phone and would otherwise break in the
+   middle of "90 thousand". */
+@media (max-width: 420px) {
+    .strength-detail { max-width: 30ch; }
+}
+
+/* Language warning marker -------------------------------------------------
+   Shown on hover AND focus, and reachable by keyboard via tabindex, because a
+   warning only a mouse can reveal is not a warning for everyone. */
+.hint {
+    position: relative;
+    display: inline-block;
+    margin-left: 3px;
+    color: var(--accent-3);
+    cursor: help;
+    font-weight: 700;
+}
+
+.hint-bubble {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    width: max-content;
+    max-width: 264px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #16161c;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.74rem;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: left;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.16s ease, transform 0.16s ease;
+    z-index: 20;
+}
+
+.hint:hover .hint-bubble,
+.hint:focus .hint-bubble,
+.hint:focus-visible .hint-bubble {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Max entropy ------------------------------------------------------------- */
+.max-entropy-btn {
+    margin-top: 8px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.72);
+    font: inherit;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: border-color 0.16s ease, color 0.16s ease;
+}
+
+.max-entropy-btn:hover,
+.max-entropy-btn:focus-visible {
+    border-color: var(--accent-3);
+    color: var(--accent-3);
+}
+
+.max-hint {
+    margin-top: 6px;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.38);
+    max-width: 34ch;
+    text-align: center;
+}
+
+/* Reads as a statement of fact when you are already there, not as a nudge. */
+.max-hint.is-max { color: var(--accent-3); }

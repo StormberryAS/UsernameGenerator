@@ -1,0 +1,60 @@
+case_id,description,input,expected
+S001,U+00DF in de from de_adjectives.txt,großartig,grossartig
+S002,U+00E0 in it from it_nouns.txt,verità,verita
+S003,U+00E1 in es from es_adjectives.txt,fantástico,fantastico
+S004,U+00E2 in fr from fr_nouns.txt,âme,ame
+S005,U+00E3 in pt from pt_adjectives.txt,brincalhão,brincalhao
+S006,U+00E4 in de from de_adjectives.txt,prächtig,prachtig
+S007,U+00E5 in no from no_adjectives.txt,storslått,storslatt
+S008,U+00E6 in no from no_adjectives.txt,ærlig,aerlig
+S009,U+00E7 in fr from fr_verbs.txt,façonner,faconner
+S010,U+00E8 in fr from fr_adjectives.txt,fidèle,fidele
+S011,U+00E9 in es from es_adjectives.txt,espléndido,esplendido
+S012,U+00EA in fr from fr_adjectives.txt,suprême,supreme
+S013,U+00EB in fr from fr_nouns.txt,canoë,canoe
+S014,U+00ED in es from es_adjectives.txt,magnífico,magnifico
+S015,U+00EE in fr from fr_nouns.txt,maître,maitre
+S016,U+00EF in fr from fr_adjectives.txt,héroïque,heroique
+S017,U+00F1 in es from es_adjectives.txt,castaño,castano
+S018,U+00F3 in es from es_adjectives.txt,sólido,solido
+S019,U+00F4 in fr from fr_adjectives.txt,drôle,drole
+S020,U+00F6 in de from de_adjectives.txt,schön,schon
+S021,U+00F8 in no from no_adjectives.txt,glødende,glodende
+S022,U+00FA in es from es_adjectives.txt,púrpura,purpura
+S023,U+00FB in fr from fr_adjectives.txt,brûlant,brulant
+S024,U+00FC in de from de_adjectives.txt,glühend,gluhend
+S025,U+0103 in ro from ro_adjectives.txt,îndrăzneţ,indraznet
+S026,U+0105 in pl from pl_adjectives.txt,chrupiący,chrupiacy
+S027,U+0107 in pl from pl_nouns.txt,radość,radosc
+S028,U+0119 in pl from pl_adjectives.txt,piękny,piekny
+S029,U+0142 in pl from pl_adjectives.txt,wspaniały,wspanialy
+S030,U+0144 in pl from pl_adjectives.txt,pomarańczowy,pomaranczowy
+S031,U+0153 in fr from fr_nouns.txt,cœur,coeur
+S032,U+015B in pl from pl_adjectives.txt,śliczny,sliczny
+S033,U+015F in ro from ro_verbs.txt,câştiga,castiga
+S034,U+0163 in ro from ro_adjectives.txt,îndrăzneţ,indraznet
+S035,U+017A in pl from pl_adjectives.txt,mroźny,mrozny
+S036,U+017C in pl from pl_adjectives.txt,odważny,odwazny
+S037,U+0219 in ro from ro_adjectives.txt,pașnic,pasnic
+S038,U+021B in ro from ro_adjectives.txt,măreț,maret
+S039,transliterate U+00F8 alone,ø,o
+S040,transliterate U+00F8 in context,xøx,xox
+S041,transliterate U+0142 alone,ł,l
+S042,transliterate U+0142 in context,xłx,xlx
+S043,transliterate U+00DF alone,ß,ss
+S044,transliterate U+00DF in context,xßx,xssx
+S045,transliterate U+00E6 alone,æ,ae
+S046,transliterate U+00E6 in context,xæx,xaex
+S047,transliterate U+0153 alone,œ,oe
+S048,transliterate U+0153 in context,xœx,xoex
+S049,transliterate U+0111 alone,đ,d
+S050,transliterate U+0111 in context,xđx,xdx
+S051,transliterate U+00F0 alone,ð,d
+S052,transliterate U+00F0 in context,xðx,xdx
+S053,transliterate U+00FE alone,þ,th
+S054,transliterate U+00FE in context,xþx,xthx
+S055,transliterate U+0131 alone,ı,i
+S056,transliterate U+0131 in context,xıx,xix
+S057,empty string,,
+S058,plain ascii is unchanged,simplecase,simplecase
+S059,hyphenated dictionary entry survives,nascer-do-sol,nascer-do-sol

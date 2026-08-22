@@ -31,6 +31,15 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
+      # Runs BEFORE the build, so a release cannot be cut while the three
+      # implementations disagree about what a username is worth. Catches two
+      # things the Kotlin test cannot: a golden corpus left stale after script.js
+      # changed, and username.py drifting away from the other two entirely.
+      # working-directory is overridden because this one lives at the repo root.
+      - name: Check strength parity across web, Android and CLI
+        working-directory: .
+        run: python3 tools/check-strength-parity.py
+
       # The runner ships an Android SDK, but not necessarily platform 37.1, and its
       # bundled sdkmanager may be too old to know that package exists. Refresh
       # cmdline-tools first, then install, and let the output show if it fails.

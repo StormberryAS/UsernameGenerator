@@ -38,8 +38,12 @@ android {
         applicationId = "no.stormberry.usernamegenerator"
         minSdk = 24
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.0.1"
+        // 1.1.0, not another 1.0.1: this release adds the strength readout, the
+        // digit options, the random/mix language modes and the separator modes.
+        // Tagging from 1.0.1 would put a materially different APK behind a version
+        // people already have.
+        versionCode = 3
+        versionName = "1.1.0"
 
         // No instrumentation tests, no test runner, nothing that pulls in extra permissions.
         // Density-split PNGs are generated at build time from vectors and are a source of
@@ -147,7 +151,11 @@ val copyDictionaries by tasks.registering(Copy::class) {
     description = "Copies the shared word lists from the repo root into app assets."
     group = "build"
     from(rootProject.file("../data")) {
+        // entropy-model.tsv rides along with the word lists on purpose: it is
+        // DERIVED from them, so shipping one without the other would leave the app
+        // quoting entropy for dictionaries it no longer has.
         include("*.txt")
+        include("entropy-model.tsv")
     }
     into(dictionaryAssetsDir.map { it.dir("data") })
     // Deterministic ordering, so the APK is byte-reproducible across machines.

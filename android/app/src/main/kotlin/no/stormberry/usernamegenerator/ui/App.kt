@@ -43,6 +43,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -63,6 +64,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -71,10 +73,15 @@ import androidx.core.net.toUri
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import no.stormberry.usernamegenerator.Dictionaries
+import no.stormberry.usernamegenerator.DigitPosition
 import no.stormberry.usernamegenerator.R
 import no.stormberry.usernamegenerator.Language
+import no.stormberry.usernamegenerator.MaxEntropyOptions
 import no.stormberry.usernamegenerator.Separator
 import no.stormberry.usernamegenerator.Settings
+import no.stormberry.usernamegenerator.EntropyModel
+import no.stormberry.usernamegenerator.Strength
+import no.stormberry.usernamegenerator.StrengthReadout
 import no.stormberry.usernamegenerator.UsernameEngine
 import no.stormberry.usernamegenerator.WordType
 
@@ -89,6 +96,10 @@ fun UsernameGeneratorApp(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val settings = remember { Settings(context) }
     val dictionaries = remember { Dictionaries(context.assets) }
+    // Read once and held for the process: 23 rows, and the two random-language modes
+    // need it on every keystroke. Null if the asset is missing, which downgrades those
+    // two modes to the uniform figure rather than breaking the readout.
+    val entropyModel = remember { EntropyModel.fromAssets(context.assets) }
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -96,12 +107,31 @@ fun UsernameGeneratorApp(modifier: Modifier = Modifier) {
     var wordType by remember { mutableStateOf(settings.wordType) }
     var language by remember { mutableStateOf(settings.language) }
     var separator by remember { mutableStateOf(settings.separator) }
+    var addDigits by remember { mutableStateOf(settings.addDigits) }
+    var digitPosition by remember { mutableStateOf(settings.digitPosition) }
+    var digitCount by remember { mutableIntStateOf(settings.digitCount) }
+    // Recomputed only from the inputs that actually move the figure. separator is
+    // deliberately absent: it is a fixed choice rather than a draw, so it changes
+    // the shape of the name without changing how many there are.
+    val strength = remember(wordCount, wordType, language, addDigits, digitCount, separator) {
+        Strength.describe(
+            entropyModel, dictionaries, wordCount, wordType, language, addDigits, digitCount,
+            separator)
+    }
+    // Independent of every control, so computed once rather than per keystroke.
+    val maxOptions = remember { Strength.maxEntropyOptions(entropyModel) }
+    val atMaxEntropy = language == maxOptions.language && wordType == maxOptions.wordType &&
+        wordCount == maxOptions.wordCount && addDigits &&
+        digitCount == maxOptions.digitCount && separator == maxOptions.separator
     var username by remember { mutableStateOf("") }
     var justCopied by remember { mutableStateOf(false) }
     val history = remember { mutableStateListOf<String>() }
 
     fun generate() {
-        val next = UsernameEngine.generate(dictionaries, wordCount, wordType, language, separator)
+        val next = UsernameEngine.generate(
+            dictionaries, wordCount, wordType, language, separator,
+            addDigits, digitPosition, digitCount,
+        )
         if (username.isNotEmpty()) {
             history.remove(username)
             history.add(0, username)
@@ -154,6 +184,29 @@ fun UsernameGeneratorApp(modifier: Modifier = Modifier) {
                 justCopied = justCopied,
                 onCopy = { copy(username) },
                 onRegenerate = ::generate,
+            )
+
+            Spacer(Modifier.height(14.dp))
+
+            StrengthLine(
+                readout = strength,
+                maxOptions = maxOptions,
+                atMax = atMaxEntropy,
+                onApplyMax = {
+                    language = maxOptions.language
+                    wordType = maxOptions.wordType
+                    wordCount = maxOptions.wordCount
+                    addDigits = maxOptions.addDigits
+                    digitCount = maxOptions.digitCount
+                    separator = maxOptions.separator
+                    settings.separator = maxOptions.separator
+                    settings.language = maxOptions.language
+                    settings.wordType = maxOptions.wordType
+                    settings.wordCount = maxOptions.wordCount
+                    settings.addDigits = maxOptions.addDigits
+                    settings.digitCount = maxOptions.digitCount
+                    generate()
+                },
             )
 
             Spacer(Modifier.height(20.dp))
@@ -216,13 +269,69 @@ fun UsernameGeneratorApp(modifier: Modifier = Modifier) {
                 ChipRow(
                     options = Language.entries,
                     selected = language,
-                    label = { it.label },
+                    // The asterisk marks the one option the note below is about.
+                    // Marking all thirteen would attach the warning to twelve
+                    // options it does not apply to.
+                    label = { if (it == Language.MIX) "${it.label} *" else it.label },
                     onSelect = {
                         language = it
                         settings.language = it
                         generate()
                     },
                 )
+            }
+
+            Spacer(Modifier.height(8.dp))
+            MixLanguageNote()
+
+            // Presented as a two-option row rather than a switch, so it matches every
+            // other control on the screen and states both outcomes rather than leaving
+            // the user to infer what "off" means.
+            ControlSection("Digits") {
+                ChipRow(
+                    options = listOf(false, true),
+                    selected = addDigits,
+                    label = { if (it) "on" else "none" },
+                    onSelect = {
+                        addDigits = it
+                        settings.addDigits = it
+                        generate()
+                    },
+                )
+            }
+
+            // Both of these are hidden rather than disabled while digits are off,
+            // because with no digits to place there is nothing for them to say: a
+            // greyed-out row would still be asking a question that has no answer, and
+            // would leave the screen longer for no gain. The chosen values survive in
+            // Settings, so turning digits back on restores the arrangement rather than
+            // resetting it.
+            if (addDigits) {
+                ControlSection("Digit position") {
+                    ChipRow(
+                        options = DigitPosition.entries,
+                        selected = digitPosition,
+                        label = { it.label },
+                        onSelect = {
+                            digitPosition = it
+                            settings.digitPosition = it
+                            generate()
+                        },
+                    )
+                }
+
+                ControlSection("Digits per word") {
+                    ChipRow(
+                        options = (Settings.MIN_DIGITS..Settings.MAX_DIGITS).toList(),
+                        selected = digitCount,
+                        label = { it.toString() },
+                        onSelect = {
+                            digitCount = it
+                            settings.digitCount = it
+                            generate()
+                        },
+                    )
+                }
             }
 
             ControlSection("Separator") {
@@ -356,6 +465,106 @@ private fun OutputCard(
             }
         }
     }
+}
+
+/**
+ * What the current options are worth, between the name and the Generate button
+ * because it is a property of the one and a consequence of the other.
+ *
+ * Two figures rather than one, because "1 in N" and "how many before a repeat"
+ * are wildly different numbers and quoting only the flattering one would be a
+ * kind of lying: at 16.5 bits they are 90,000 and 353.
+ *
+ * Deliberately not colour-coded. Green-for-strong would be a verdict, and a
+ * username is not a password: unpredictable is not the same as safe, and the app
+ * has no business implying it is. The figures are stated; the judgement is the
+ * reader's.
+ */
+@Composable
+private fun StrengthLine(
+    readout: StrengthReadout,
+    maxOptions: MaxEntropyOptions,
+    atMax: Boolean,
+    onApplyMax: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        // Merged so a screen reader announces one sentence rather than stopping
+        // between fragments that only mean anything together.
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) {},
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = "${readout.bitsText} bits of entropy",
+            style = MaterialTheme.typography.labelLarge,
+            color = Stormberry.AccentSky,
+        )
+        Spacer(Modifier.height(3.dp))
+        Text(
+            text = "1 in ${readout.combinations} combinations",
+            style = MaterialTheme.typography.bodySmall,
+            color = Stormberry.TextMuted,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = "Even odds of a repeat after ${readout.collisionAt} names",
+            style = MaterialTheme.typography.bodySmall,
+            color = Stormberry.TextMuted,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(10.dp))
+        if (atMax) {
+            Text(
+                text = "This is the strongest combination available.",
+                style = MaterialTheme.typography.bodySmall,
+                color = Stormberry.AccentSky,
+                textAlign = TextAlign.Center,
+            )
+        } else {
+            // Says what it would change to and what that is worth, so pressing it
+            // is an informed choice rather than a mystery button.
+            TextButton(onClick = onApplyMax) {
+                Text("Max entropy", style = MaterialTheme.typography.labelMedium)
+            }
+            Text(
+                text = "Mix languages, ${maxOptions.wordCount} " +
+                    (if (maxOptions.wordType == WordType.MIXED) "mixed words"
+                     else maxOptions.wordType.key + "s") +
+                    ", ${maxOptions.digitCount} digits each, mixed separators: " +
+                    "${maxOptions.strength.bitsText} bits",
+                style = MaterialTheme.typography.bodySmall,
+                color = Stormberry.TextMuted,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+/**
+ * The asterisk on "Mix languages", explained.
+ *
+ * Sits directly under the control rather than in an about screen, because the
+ * cost it describes is paid the moment that option is chosen. The wording is
+ * deliberate about WHY it happens: the word lists were each reviewed by a native
+ * speaker of their own language and nothing else, so a word that is entirely
+ * innocent in Polish has never been read by anyone asking how it lands in
+ * Portuguese. Mixing is the first mode that puts them side by side.
+ */
+@Composable
+private fun MixLanguageNote(modifier: Modifier = Modifier) {
+    Text(
+        text = "* Every word list is checked by a native speaker of its own language " +
+            "only, so any name may contain a word that means something unfortunate " +
+            "in another language. Mixing makes that more likely, because it draws " +
+            "each word from the combined vocabulary of all eleven. Generate again " +
+            "if you do not like what you get.",
+        style = MaterialTheme.typography.bodySmall,
+        color = Stormberry.TextMuted,
+        textAlign = TextAlign.Start,
+        modifier = modifier.fillMaxWidth(),
+    )
 }
 
 @Composable
