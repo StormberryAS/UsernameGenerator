@@ -623,6 +623,21 @@ def main():
     for arg in args:
         if arg == "save":
             save_requested = True
+        elif arg in ("max", "--max", "maxentropy", "--max-entropy"):
+            # Applies the strongest settings available, COMPUTED from the entropy
+            # model rather than hardcoded. Which word type wins depends on how much
+            # the dictionaries overlap between languages, and that changes whenever a
+            # word list is edited, so writing today's answer in here would quietly
+            # become wrong. Mirrors the "Max entropy" control in the web and Android
+            # apps, and reads from the same table, so all three agree on what
+            # "maximum" means.
+            best = max_entropy_options(load_entropy_model())
+            num_words = best["num_words"]
+            word_type = best["word_type"]
+            lang = best["language"]
+            add_digits = best["add_digits"]
+            digit_count = best["digit_count"]
+            separator = best["separator"]
         elif arg.isdigit():
             num_words = int(arg)
         elif arg in ["noun", "adjective", "verb", "mixed"]:
@@ -671,6 +686,7 @@ def main():
             print("\nOptions can be provided in any order:")
             print("  <number>           Number of words (e.g., '1', '3')")
             print("  quiet              Suppress the entropy line on stderr")
+            print("  max                Strongest settings available (computed, not fixed)")
             print("  random             Draw one language at random for the whole name (default)")
             print("  mix                Draw each word from all languages pooled (may read oddly)")
             print("  separator:random   One separator drawn at random, used throughout")
@@ -690,6 +706,7 @@ def main():
             print("\nExamples:")
             print("  username 3 pt save")
             print("  username noun separator:_")
+            print("  username max")
             print("  username 2 digits:2 digitpos:before separator:.")
             sys.exit(0)
         else:
