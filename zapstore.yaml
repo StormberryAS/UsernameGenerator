@@ -15,19 +15,36 @@ summary: Memorable usernames in 11 languages, generated on your device
 description: |
   UsernameGenerator builds memorable usernames from curated word lists in 11
   languages: English, Norsk, Português, Español, Deutsch, Français, Italiano,
-  Nederlands, Polski, Română and Latina.
+  Nederlands, Polski, Română and Latina. Every list was reviewed by a native
+  speaker of that language.
 
   It declares no Android permissions at all. Not "only the clipboard": genuinely
   none. Everything runs on word lists compiled into the APK, so there is no
   network access, no storage access and nothing to phone home with. Check it
   yourself before installing:
 
-      aapt dump permissions UsernameGenerator-v1.0.1.apk
+      aapt dump permissions UsernameGenerator-v1.1.0.apk
 
   The only line you should see is the package name.
 
-  - Choose 1 to 5 words, mixed or adjectives / nouns / verbs only, and a
-    separator of none, hyphen, underscore or full stop.
+  It also shows you what your settings are actually worth, as you change them:
+
+      44.6 bits of entropy
+      1 in 27 trillion combinations
+      Even odds of a repeat after 6.1 million names
+
+  Those are two different questions and the second is the one people guess wrong.
+  Two words with no digits is 90,000 combinations but a coin-flip repeat after
+  just 353 names. One word repeats after about twenty people.
+
+  - 1 to 5 words: mixed, or adjectives / nouns / verbs only.
+  - Digits: on by default, before or after each word, one to five per word. Each
+    word gets its own independently drawn run.
+  - Languages: pick one, or let it draw one at random for the whole name, or mix
+    every word from the pooled vocabulary of all eleven.
+  - Separators: none, hyphen, underscore, full stop, one drawn at random for the
+    whole name, or a different one in every gap.
+  - No word ever appears twice in the same name.
   - Accents are stripped after generation, so "condução" becomes "conducao" and
     the result is accepted everywhere.
   - Randomness comes from SecureRandom, not a predictable PRNG. People generate
@@ -37,9 +54,16 @@ description: |
     disk. A saved list of the identities you generated is exactly the file you
     would not want on the device.
 
+  A note on the entropy figures, since most apps quote the flattering number: the
+  guessing figure uses min-entropy, the worst case, and the repeat figure uses
+  collision entropy, because that is what actually governs how soon two people
+  collide. Mixing languages is worth less than it looks, because the word lists
+  overlap: "ninja" appears in nine of the eleven. The app measures what mixing is
+  really worth rather than assuming.
+
   The same engine also runs on the web at username.stormberry.as and as a Python
-  CLI in the repository. All three produce the same shapes from the same
-  dictionaries.
+  CLI in the repository. All three are pinned to a shared corpus of 4,684
+  expectations, so they cannot silently disagree.
 
 tags:
   - privacy
