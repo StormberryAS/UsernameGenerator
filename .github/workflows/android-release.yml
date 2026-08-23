@@ -69,7 +69,14 @@ jobs:
           ORG_GRADLE_PROJECT_RELEASE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           ORG_GRADLE_PROJECT_RELEASE_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           ORG_GRADLE_PROJECT_RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew --no-daemon :app:lintRelease :app:assembleRelease
+        # testDebugUnitTest FIRST, so a release cannot be cut past a failing test.
+        # It was absent until 2026-08-22, which meant the six JVM test classes in
+        # this repo had never run in CI once: the golden-corpus checks behind the
+        # strength readout, the digit contract, the language modes and the
+        # sanitise parity all passed only on whatever machine last ran them by
+        # hand. SunApp's workflow had it from the start; this brings the two into
+        # line.
+        run: ./gradlew --no-daemon :app:testDebugUnitTest :app:lintRelease :app:assembleRelease
 
       # Fails the release if signing silently fell back to unsigned, and asserts the
       # zero-permissions claim in CI rather than trusting it.
