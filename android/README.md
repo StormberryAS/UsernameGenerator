@@ -84,7 +84,7 @@ Pinned deliberately in `gradle/libs.versions.toml`. These versions are load-bear
 
 | Component | Version | Why this one |
 |---|---|---|
-| JDK | 21 | AGP 9.3's minimum and default is 17. Nothing above 21 is validated by Google, and builds on JDK 25 fail |
+| JDK | Temurin 21.0.12.1+1 | AGP 9.3's minimum and default is 17. Nothing above 21 is validated by Google, and builds on JDK 25 fail. `jvmToolchain(21)` pins the version; the **vendor** matters too, see below |
 | Gradle | 9.5.0 | AGP 9.3's minimum *and* default |
 | AGP | 9.3.1 | Latest stable |
 | Kotlin | 2.2.10 | Not a free choice: AGP 9.0+ has built-in Kotlin and 9.3.1 bundles exactly this. Do not apply `org.jetbrains.kotlin.android`, it now fails the build |
@@ -93,6 +93,51 @@ Pinned deliberately in `gradle/libs.versions.toml`. These versions are load-bear
 | compileSdk | 37.1 | Forced by androidx: core-ktx 1.19.0 and lifecycle 2.11.0 require API 37+ |
 | targetSdk | 36 | What Google Play requires for new apps from 31 August 2026. API 37 opts into runtime behaviour this app has not been tested against |
 | minSdk | 24 | Android 7.0. Also why v1 JAR signing is off; v2 covers everything from 7.0 |
+
+### Reproducing a release byte for byte
+
+Measured on v1.1.1 on 2026-09-03, not assumed:
+
+| Build | APK SHA-256 |
+|---|---|
+| CI, Temurin 21.0.12.1+1 | `5dfc716378525419112a96b234bcc6ee53d174cc1178079f29cbb585d79abe46` |
+| Local, Temurin 21.0.12.1+1 | `5dfc7163…` identical |
+| Local, Debian OpenJDK 21.0.12.1 | `6cce82b2…` differs |
+
+So the guarantee holds, but it is conditional on the JDK **build** and not merely its version.
+Debian's 21.0.12.1 and Temurin's 21.0.12.1+1 are the same upstream release, and they still
+produce a `classes.dex` differing by 188 bytes, which drags the derived `baseline.prof` with
+it. Everything else in the APK, the manifest, resources, assets and word lists, was
+byte-identical in all three builds. `jvmToolchain(21)` fixes the version, not the vendor.
+
+To reproduce a published APK:
+
+```bash
+# 1. The exact JDK CI used. Confirm it from the release run's setup-java step, which prints
+#    the tool-cache path, e.g. Java_Temurin-Hotspot_jdk/21.0.12-1.
+curl -sSL -o temurin21.tar.gz \
+  "https://api.adoptium.net/v3/binary/version/jdk-21.0.12.1%2B1/linux/x64/jdk/hotspot/normal/eclipse"
+mkdir -p ~/.local/jdks && tar xzf temurin21.tar.gz -C ~/.local/jdks
+
+# 2. Build the tag with that JDK and nothing else visible to Gradle.
+git checkout android-v1.1.1
+cd android
+./gradlew --no-build-cache :app:clean :app:assembleRelease \
+  -Porg.gradle.java.installations.auto-detect=false \
+  -Porg.gradle.java.installations.paths=$HOME/.local/jdks/jdk-21.0.12.1+1
+
+# 3. Compare against the .sha256 published beside the release.
+sha256sum app/build/outputs/apk/release/app-release.apk
+```
+
+Without the signing key you cannot produce an identical signed APK, so compare the contents
+instead: unzip both and diff the entry hashes, ignoring `META-INF`. That is how the 188-byte
+`classes.dex` difference above was isolated.
+
+**Not pinned in the build script on purpose.** A `vendor = JvmVendorSpec.ADOPTIUM` in the
+toolchain spec would make this true by construction, at the cost of failing for anyone whose
+only JDK 21 comes from their distribution, unless a toolchain resolver is added to download
+one. The version pin plus this recipe was judged the better trade for a small public repo.
 
 ### Signing
 
