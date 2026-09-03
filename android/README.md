@@ -14,7 +14,18 @@ The footer links to stormberry.as. That is a hand-off, not a network call: the a
 
 ## Install
 
-The app is not on Google Play. Download the APK from [Releases](https://github.com/StormberryAS/UsernameGenerator/releases), then either:
+The app ships as **two separate packages**, on purpose.
+
+| Package | Where | Signed by |
+|---|---|---|
+| `no.stormberry.usernamegenerator` | GitHub Releases, Obtainium, Zapstore | our own key, the certificate the NIP-C1 event vouches for |
+| `no.stormberry.usernamegenerator.play` | Google Play | Google, under Play App Signing, from a bundle we sign with a separate upload key |
+
+Two application IDs are two apps as far as Android is concerned, so they install side by
+side and **neither can ever update the other**. That is the point: nothing Google does to
+the Play copy can reach an install that came from here.
+
+For the sovereign package, download the APK from [Releases](https://github.com/StormberryAS/UsernameGenerator/releases), then either:
 
 - **On the phone:** tap the downloaded file. Android will ask you to allow installs from whichever app is doing the installing (browser or file manager). That toggle lives at *Settings, Apps, Special app access, Install unknown apps*. Play Protect may warn about an app it has not seen before; that is expected for a small independent release.
 - **Over USB:** `adb install UsernameGenerator-v1.0.1.apk`. Cleaner, and it avoids the per-source permission entirely.
@@ -89,6 +100,7 @@ The keystore never enters this repository and never enters the Obsidian vault.
 
 - **Locally:** `android/keystore.properties` (gitignored) points at a keystore held outside the repo tree entirely, with passwords read from the system keyring. Without it, `assembleDebug` still works and `assembleRelease` produces an unsigned APK rather than failing.
 - **In CI:** four repository secrets, `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`. The keystore is decoded into `$RUNNER_TEMP`, outside the workspace, and shredded in an `always()` step.
+- **Play upload key:** four more properties in the same file, `playUploadStoreFile`, `playUploadStorePassword`, `playUploadKeyAlias` and `playUploadKeyPassword` (or `PLAY_UPLOAD_*` as Gradle properties). This is a **different key from the release key and must stay different**: it signs the bundle so Play can tell who uploaded it, never anything a user installs, which is why losing it means an upload key reset in the Play Console rather than an app that can never be updated again.
 
 Signature schemes are pinned explicitly (v2 and v3 on, v1 and v4 off) because AGP documents their defaults only as "if null, a default value is used", which means an AGP upgrade could silently change what the APK carries.
 
@@ -100,6 +112,38 @@ git push origin android-v1.0.1
 ```
 
 `.github/workflows/android-release.yml` then builds, lints, **fails the release if the APK declares any permission**, attests provenance and publishes to GitHub Releases.
+
+### Publishing to Play
+
+```bash
+./gradlew :app:bundleRelease -PplayBuild=true
+# app/build/outputs/bundle/release/usernamegenerator-play-release.aab
+```
+
+`-PplayBuild=true` is the only thing that changes the application ID and the signing key.
+Two guards sit on the release tasks, because the failure modes here are permanent:
+
+- **`bundleRelease` without the flag fails.** That AAB would carry the sovereign application
+  ID signed with the release key, and uploading it would permanently claim that package on
+  Play and enrol our release certificate into Play App Signing. The sovereign channel ships
+  APKs; only Play takes a bundle.
+- **`assembleRelease` with the flag fails.** Play takes the bundle, and an installable
+  `.play` APK has no destination.
+
+**Two number lines, one codebase.** Play does not share the sovereign numbering, so a
+build's channel is obvious from its version alone. Play only requires monotonicity within
+its own package, so nothing forces the lines to track each other. What must stay true is the
+mapping:
+
+| Sovereign tag | Sovereign version | Play version | Same code? |
+|---|---|---|---|
+| `android-v1.1.0` | 1.1.0 (code 3) | not published | n/a |
+| `android-v1.1.1` | 1.1.1 (code 4) | 1.2.0 (code 5) | yes |
+
+**Every Play upload is built from a tag that shipped on GitHub Releases.** Never respin Play
+from an untagged tree; bump, tag, and add a row here. Order of operations: bump, tag, let CI
+publish the APK, `zsp publish zapstore.yaml`, then build the bundle from that same commit
+and add the row.
 
 ## Known limits
 

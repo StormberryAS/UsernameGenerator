@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Only the four generator preferences are backed up. Nothing else exists: no
-  account, no history on disk, no cache worth restoring.
+  API 30 and below, where dataExtractionRules does not exist yet and this file is what the
+  platform reads. It excludes rather than includes: nothing in the app's data directory
+  leaves the device. Redundant on top of allowBackup="false", which already stops backup
+  outright on these versions, but lint requires the pairing and a file that agrees with the
+  policy is better than a suppression.
 -->
 <full-backup-content>
-    <include domain="sharedpref" path="username_generator.xml" />
+    <exclude domain="root" />
+    <exclude domain="external" />
 </full-backup-content>

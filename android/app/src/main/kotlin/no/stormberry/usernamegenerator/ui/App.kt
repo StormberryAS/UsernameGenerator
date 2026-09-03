@@ -526,7 +526,13 @@ private fun StrengthLine(
             // Says what it would change to and what that is worth, so pressing it
             // is an informed choice rather than a mystery button.
             TextButton(onClick = onApplyMax) {
-                Text("Max entropy", style = MaterialTheme.typography.labelMedium)
+                // Same contrast fix as the privacy dialog's Close: the default TextButton
+                // content colour is AccentIndigo, which is unreadable on this background.
+                Text(
+                    "Max entropy",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Stormberry.TextMain,
+                )
             }
             Text(
                 text = "Mix languages, ${maxOptions.wordCount} " +
@@ -649,6 +655,7 @@ private fun HistorySection(history: List<String>, onCopy: (String) -> Unit) {
 @Composable
 private fun Footer(onLinkUnopenable: () -> Unit) {
     val context = LocalContext.current
+    var showPrivacy by remember { mutableStateOf(false) }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = "No permissions. No network. No tracking.",
@@ -656,6 +663,26 @@ private fun Footer(onLinkUnopenable: () -> Unit) {
             color = Stormberry.TextMuted,
             textAlign = TextAlign.Center,
         )
+        // The line above is a claim; this is where it can be read in full. It opens a
+        // dialog rather than a URL because the app has no INTERNET permission, which is
+        // the very thing the policy is describing. Play also requires the policy to be
+        // reachable inside the app, and a link would not satisfy that here.
+        TextButton(
+            onClick = { showPrivacy = true },
+            // The lockup below brings its own generous padding, so this only needs a tap
+            // target, not a second gap underneath it.
+            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+        ) {
+            Text(
+                text = "Privacy",
+                style = MaterialTheme.typography.bodySmall,
+                color = Stormberry.TextMuted,
+                textDecoration = TextDecoration.Underline,
+            )
+        }
+        if (showPrivacy) {
+            PrivacyDialog(onDismiss = { showPrivacy = false })
+        }
         // The company line and the lockup are one control, not two. They go to the
         // same place, and the lockup's wordmark says "Stormberry" again, so as two
         // adjacent nodes a screen reader would read the same link twice. Clickable

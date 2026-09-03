@@ -203,3 +203,9 @@ Supplied free of charge, **as is**, with no warranty of any kind. Using it creat
 This is a **functioning prototype**, not a certified instrument and not a professional service. Values are computed or modelled, not measured. Check anything that matters against an authoritative source before you act on it. Stormberry AS reimburses no cost or loss arising from use of this application.
 
 Full terms: [DISCLAIMER.md](DISCLAIMER.md).
+
+## Privacy
+
+Nothing is collected. No account, no analytics, no crash reporting, no advertising, no cookies and no identifier of any kind. The Android build declares **no permissions at all** and has INTERNET stripped from the package, so it cannot reach the network; the web version runs entirely in your browser.
+
+Full policy: [PRIVACY.md](PRIVACY.md), also published at [username.stormberry.as/privacy.html](https://username.stormberry.as/privacy.html) and shown inside the app.

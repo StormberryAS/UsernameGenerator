@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="index, follow" />
+<title>Privacy &middot; UsernameGenerator &middot; Stormberry AS</title>
+<meta name="description" content="UsernameGenerator collects nothing: no account, no analytics, no cookies, and no Android permissions at all." />
+<style>
+  :root {
+    color-scheme: dark light;
+    --bg: #0d1117; --fg: #d7dde5; --dim: #97a2b0;
+    --accent: #d8a340; --rule: #232c38; --card: #131b24;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg:#fbfaf7; --fg:#1d242c; --dim:#5c6773;
+            --accent:#8a6412; --rule:#e2ded4; --card:#fff; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 3rem 1.25rem 5rem;
+    background: var(--bg); color: var(--fg);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+    -webkit-text-size-adjust: 100%;
+  }
+  main { max-width: 46rem; margin: 0 auto; }
+  h1 { font-size: 1.7rem; line-height: 1.25; margin: 0 0 .4rem; letter-spacing: -.01em; }
+  h2 { font-size: 1.06rem; margin: 2.4rem 0 .6rem; color: var(--accent);
+       letter-spacing: .02em; text-transform: uppercase; }
+  p { margin: 0 0 1rem; }
+  strong { color: #fff; font-weight: 600; }
+  @media (prefers-color-scheme: light) { strong { color: #000; } }
+  a { color: var(--accent); }
+  a:hover { text-decoration: none; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+         font-size: .92em; background: var(--card); padding: .1em .35em;
+         border-radius: 3px; }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 2.5rem 0 1.5rem; }
+  .back { display: inline-block; margin-bottom: 2.2rem; font-size: .9rem;
+          color: var(--dim); text-decoration: none; }
+  .back:hover { color: var(--accent); }
+  .scope { color: var(--dim); font-size: .95rem; margin-bottom: 2rem; }
+  footer { max-width: 46rem; margin: 3rem auto 0; padding-top: 1.4rem;
+           border-top: 1px solid var(--rule); color: var(--dim);
+           font-size: .85rem; }
+</style>
+</head>
+<body>
+<main>
+<a class="back" href="./">&larr; Back to UsernameGenerator</a>
+<h1>Privacy</h1>
+<p class="scope"><strong>Applies to UsernameGenerator: the Android application, and the web version on this site.</strong></p>
+<h2>The short version</h2>
+<p>UsernameGenerator collects nothing. No account, no analytics, no crash reporting, no advertising, no cookies and no identifier of any kind. There is nothing to request, correct or erase, because there is nothing.</p>
+<h2>The Android application</h2>
+<p>It declares <strong>no Android permissions at all</strong>. Not "only the clipboard": genuinely none. The INTERNET permission is stripped from the built package, so the app cannot reach the network even if a future dependency tried to add it. Check before you install: <code>aapt dump permissions UsernameGenerator-&lt;version&gt;.apk</code></p>
+<p><strong>What stays on your device.</strong> Your settings, meaning the language, the word type, the length, and the digit and separator choices, are saved in the app's private storage so they survive a restart. Nothing else is written down. Generated names are held in memory and are gone when you close the app.</p>
+<p><strong>They are not backed up.</strong> The app sets <code>allowBackup="false"</code>, so Android's Auto Backup never copies them to your Google account, and <code>adb backup</code> gets nothing either. It also asks Android to exclude them from device-to-device transfer, which is the one path <code>allowBackup</code> does not govern; Google's own documentation says some manufacturers do not let an app opt out of that migration, so we ask, and cannot promise. Uninstalling removes them.</p>
+<p><strong>The clipboard.</strong> Copying a name puts it on the system clipboard, which is shared with the rest of your device. On Android 13 and later the app marks the clip sensitive, which keeps it out of the clipboard preview. What happens after you paste it is between you and the app you pasted into.</p>
+<p><strong>Word lists.</strong> The word lists for all eleven languages are compiled into the app. There is no download, no update check and no server to ask.</p>
+<h2>The web version</h2>
+<p>Static files. No cookies, no local storage, no analytics and no third-party scripts or frames. The generator, its fonts and its word lists are served from this site and nowhere else, and everything you generate happens in your browser and stays there.</p>
+<p>One thing to be precise about, because "no tracking" would otherwise be doing work it has not earned: the "Explore the Stormberry Ecosystem" strip at the bottom of the page shows the icons of our other apps, and each icon is fetched from the subdomain it belongs to. Those are Stormberry's own servers rather than a third party, but they are separate hosts, so loading this page does put your IP address and browser string into their access logs before you have clicked anything. No cookies are set and nothing is measured; if you would rather not have that, the Android app makes no network connections at all.</p>
+<p>The site is served by our hosting and CDN providers, which log connections the way any web server does. That is their processing and their retention, not ours, and we add no measurement of our own on top of it.</p>
+<h2>Where you got the app</h2>
+<p>A copy installed from <strong>Google Play</strong> is delivered by Google, which applies its own logging to the download and the install. That is Google's processing, not ours, and it happens before the app ever runs.</p>
+<p>The Play listing is a separate package, <code>no.stormberry.usernamegenerator.play</code>, signed under Google's Play App Signing. The copy published on <strong>GitHub Releases, Obtainium and Zapstore</strong> is <code>no.stormberry.usernamegenerator</code>, signed with our own key, and is not routed through Google at all. Both can be installed at once, and neither can update the other.</p>
+<h2>Children</h2>
+<p>The application has no content directed at children, collects nothing from anyone, and never asks anyone's age.</p>
+<h2>Changes</h2>
+<p>If any of this changes, the date below changes with it, and the copy shown inside the application changes in the same release.</p>
+<h2>Who is responsible</h2>
+<p><strong>Stormberry AS</strong>, org.nr. 937 751 249, Ask&oslash;y, Norway. Contact: <a href="mailto:info@stormberry.as">info@stormberry.as</a></p>
+<p>The company policy covering the stormberry.as website and its contact form is a separate document at <a href="https://stormberry.as/privacy.html">stormberry.as/privacy.html</a>.</p>
+<hr />
+<p><em>Last updated 3 September 2026.</em></p>
+</main>
+<footer>&copy; 2026 Stormberry AS &middot; Org.nr. NO 937 751 249 &middot;
+Ask&oslash;y, Norway &middot;
+<a href="disclaimer.html">Disclaimer</a></footer>
+</body>
+</html>

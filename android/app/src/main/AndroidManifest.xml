@@ -32,8 +32,22 @@
         android:name="${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
         tools:node="remove" />
 
+    <!--
+      NO BACKUP. The privacy policy says your settings stay on your device, so the app must
+      not hand them to Google's Auto Backup, which would copy the preferences file to the
+      user's account and restore it on a new handset. allowBackup="false" reliably disables
+      cloud backup and adb backup. Device-to-device transfer is the one path that survives:
+      the docs are explicit that "on devices from some device manufacturers, you can't
+      disable device-to-device migration of your app's files", so data_extraction_rules asks
+      for exclusion there too and the policy says plainly that some manufacturers ignore it.
+      Both descriptor files EXCLUDE rather than include, and both are kept: backup_rules is
+      what API 30 and below read, data_extraction_rules is what 31 and above read, and lint
+      requires the pairing while minSdk is 24. They are redundant on top of
+      allowBackup="false" and that is the point: a file that agrees with the policy is better
+      than a lint suppression.
+    -->
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
