@@ -3,11 +3,11 @@ languages: English, Norsk, Portugues, Espanol, Deutsch, Francais, Italiano,
 Nederlands, Polski, Romana and Latina.
 
 It declares no Android permissions at all. Not "only the clipboard": genuinely
-none. Everything runs on word lists compiled into the APK, so there is no
+none. Everything runs on word lists compiled into the app, so there is no
 network access, no storage access and nothing to phone home with. Check it
 yourself before installing:
 
-    aapt dump permissions UsernameGenerator-v1.0.1.apk
+    aapt dump permissions <the APK you downloaded>
 
 The only line you should see is the package name.
 
