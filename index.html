@@ -160,16 +160,39 @@
             <!-- CLI Guide -->
             <div class="cli-guide">
                 <h3>Terminal Integration</h3>
-                <p>Run the identity generator locally on your machine for stateful, secure access directly from your terminal.</p>
+                <p>Run the identity generator locally on your machine for stateful, secure access directly from your terminal. It needs Python 3 and nothing else: no packages to install, and it never touches the network.</p>
+                <p class="cli-note">The generator reads its word lists from a <code>data</code> folder that has to sit beside the script, so install the whole thing rather than the single file.</p>
+
+                <h4>Linux and macOS</h4>
                 <pre>
-# 1. Download the script
-curl -O https://github.com/StormberryAS/UsernameGenerator/raw/main/username.py
+mkdir -p ~/.local/share/username-generator ~/.local/bin
+curl -fsSL https://github.com/StormberryAS/UsernameGenerator/archive/refs/heads/main.tar.gz \
+  | tar -xz --strip-components=1 -C ~/.local/share/username-generator
+chmod +x ~/.local/share/username-generator/username.py
+ln -sf ~/.local/share/username-generator/username.py ~/.local/bin/username
 
-# 2. Make executable & link globally
-chmod +x username.py
-ln -s "$(pwd)/username.py" ~/.local/bin/username
+# macOS does not put ~/.local/bin on PATH. Most Linux distributions do.
+# If "username" is not found, add this line to ~/.zshrc or ~/.bashrc:
+export PATH="$HOME/.local/bin:$PATH"
 
-# 3. Use instantly anywhere
+username 3 pt
+                </pre>
+
+                <h4>Windows (PowerShell)</h4>
+                <pre>
+$dir = "$env:LOCALAPPDATA\UsernameGenerator"
+New-Item -ItemType Directory -Force -Path $dir | Out-Null
+Invoke-WebRequest https://github.com/StormberryAS/UsernameGenerator/archive/refs/heads/main.zip -OutFile "$env:TEMP\ug.zip"
+Expand-Archive "$env:TEMP\ug.zip" -DestinationPath "$env:TEMP\ug" -Force
+Copy-Item "$env:TEMP\ug\UsernameGenerator-main\*" $dir -Recurse -Force
+
+# a small wrapper so you can type "username" instead of "py username.py"
+Set-Content "$dir\username.cmd" '@py "%~dp0username.py" %*'
+
+# add it to your PATH once, then open a new terminal
+[Environment]::SetEnvironmentVariable('Path',
+  [Environment]::GetEnvironmentVariable('Path','User') + ";$dir", 'User')
+
 username 3 pt
                 </pre>
             </div>
@@ -180,42 +203,42 @@ username 3 pt
         <h3 class="switcher-title">Explore the Stormberry Ecosystem</h3>
         <div class="app-switcher-marquee">
                     <div class="app-switcher-track">
-                        <a href="https://stormberry.as/labs.html" class="switcher-card"><img src="https://stormberry.as/labs-favicon.svg" alt="Labs" style="width:32px;height:32px;opacity:0.9;"> <span>Stormberry Labs</span></a>
-                        <a href="https://scheduler.stormberry.as" class="switcher-card"><img src="https://scheduler.stormberry.as/favicon.svg" alt="ServiceScheduler" style="width:32px;height:32px;opacity:0.9;"> <span>ServiceScheduler</span></a>
-                        <a href="https://sun.stormberry.as" class="switcher-card"><img src="https://sun.stormberry.as/favicon.svg" alt="SunApp" style="width:32px;height:32px;opacity:0.9;"> <span>SunApp</span></a>
-                        <a href="https://moon.stormberry.as" class="switcher-card"><img src="https://moon.stormberry.as/favicon.svg" alt="MoonApp" style="width:32px;height:32px;opacity:0.9;"> <span>MoonApp</span></a>
-                        <a href="https://photo.stormberry.as" class="switcher-card"><img src="https://photo.stormberry.as/favicon.svg" alt="PhotoTimer" style="width:32px;height:32px;opacity:0.9;"> <span>PhotoTimer</span></a>
-                        <a href="https://garden.stormberry.as" class="switcher-card"><img src="https://garden.stormberry.as/favicon.svg" alt="LunarGarden" style="width:32px;height:32px;opacity:0.9;"> <span>LunarGarden</span></a>
-                        <a href="https://planet.stormberry.as" class="switcher-card"><img src="https://planet.stormberry.as/favicon.svg" alt="PlanetPulse" style="width:32px;height:32px;opacity:0.9;"> <span>PlanetPulse</span></a>
-                        <a href="https://star.stormberry.as" class="switcher-card"><img src="https://star.stormberry.as/favicon.svg" alt="StarMap" style="width:32px;height:32px;opacity:0.9;"> <span>StarMap</span></a>
-                        <a href="https://tide.stormberry.as" class="switcher-card"><img src="https://tide.stormberry.as/favicon.svg" alt="TideTracker" style="width:32px;height:32px;opacity:0.9;"> <span>TideTracker</span></a>
-                        <a href="https://astro.stormberry.as" class="switcher-card"><img src="https://astro.stormberry.as/favicon.svg" alt="AstroQuiz" style="width:32px;height:32px;opacity:0.9;"> <span>AstroQuiz</span></a>
-                        <a href="https://beer.stormberry.as" class="switcher-card"><img src="https://beer.stormberry.as/favicon.svg" alt="CheapBeer" style="width:32px;height:32px;opacity:0.9;"> <span>CheapBeer</span></a>
-                        <a href="https://flare.stormberry.as" class="switcher-card"><img src="https://flare.stormberry.as/favicon.svg" alt="SolarFlare" style="width:32px;height:32px;opacity:0.9;"> <span>SolarFlare</span></a>
-                        <a href="https://meteor.stormberry.as" class="switcher-card"><img src="https://meteor.stormberry.as/favicon.svg" alt="MeteorWatch" style="width:32px;height:32px;opacity:0.9;"> <span>MeteorWatch</span></a>
-                        <a href="https://eclipse.stormberry.as" class="switcher-card"><img src="https://eclipse.stormberry.as/favicon.svg" alt="EclipseTracker" style="width:32px;height:32px;opacity:0.9;"> <span>EclipseTracker</span></a>
-                        <a href="https://nightmode.stormberry.as" class="switcher-card"><img src="https://nightmode.stormberry.as/favicon.svg" alt="NightModeScheduler" style="width:32px;height:32px;opacity:0.9;"> <span>NightModeScheduler</span></a>
-                        <a href="https://weather.stormberry.as" class="switcher-card"><img src="https://weather.stormberry.as/favicon.svg" alt="WeatherWhisper" style="width:32px;height:32px;opacity:0.9;"> <span>WeatherWhisper</span></a>
-                        <a href="https://eco.stormberry.as" class="switcher-card"><img src="https://eco.stormberry.as/favicon.svg" alt="EcoCompass" style="width:32px;height:32px;opacity:0.9;"> <span>EcoCompass</span></a>
-                        <a href="https://username.stormberry.as" class="switcher-card"><img src="https://username.stormberry.as/favicon.svg" alt="UsernameGenerator" style="width:32px;height:32px;opacity:0.9;"> <span>UsernameGenerator</span></a>
-                        <a href="https://stormberry.as/labs.html" class="switcher-card"><img src="https://stormberry.as/labs-favicon.svg" alt="Labs" style="width:32px;height:32px;opacity:0.9;"> <span>Stormberry Labs</span></a>
-                        <a href="https://scheduler.stormberry.as" class="switcher-card"><img src="https://scheduler.stormberry.as/favicon.svg" alt="ServiceScheduler" style="width:32px;height:32px;opacity:0.9;"> <span>ServiceScheduler</span></a>
-                        <a href="https://sun.stormberry.as" class="switcher-card"><img src="https://sun.stormberry.as/favicon.svg" alt="SunApp" style="width:32px;height:32px;opacity:0.9;"> <span>SunApp</span></a>
-                        <a href="https://moon.stormberry.as" class="switcher-card"><img src="https://moon.stormberry.as/favicon.svg" alt="MoonApp" style="width:32px;height:32px;opacity:0.9;"> <span>MoonApp</span></a>
-                        <a href="https://photo.stormberry.as" class="switcher-card"><img src="https://photo.stormberry.as/favicon.svg" alt="PhotoTimer" style="width:32px;height:32px;opacity:0.9;"> <span>PhotoTimer</span></a>
-                        <a href="https://garden.stormberry.as" class="switcher-card"><img src="https://garden.stormberry.as/favicon.svg" alt="LunarGarden" style="width:32px;height:32px;opacity:0.9;"> <span>LunarGarden</span></a>
-                        <a href="https://planet.stormberry.as" class="switcher-card"><img src="https://planet.stormberry.as/favicon.svg" alt="PlanetPulse" style="width:32px;height:32px;opacity:0.9;"> <span>PlanetPulse</span></a>
-                        <a href="https://star.stormberry.as" class="switcher-card"><img src="https://star.stormberry.as/favicon.svg" alt="StarMap" style="width:32px;height:32px;opacity:0.9;"> <span>StarMap</span></a>
-                        <a href="https://tide.stormberry.as" class="switcher-card"><img src="https://tide.stormberry.as/favicon.svg" alt="TideTracker" style="width:32px;height:32px;opacity:0.9;"> <span>TideTracker</span></a>
-                        <a href="https://astro.stormberry.as" class="switcher-card"><img src="https://astro.stormberry.as/favicon.svg" alt="AstroQuiz" style="width:32px;height:32px;opacity:0.9;"> <span>AstroQuiz</span></a>
-                        <a href="https://beer.stormberry.as" class="switcher-card"><img src="https://beer.stormberry.as/favicon.svg" alt="CheapBeer" style="width:32px;height:32px;opacity:0.9;"> <span>CheapBeer</span></a>
-                        <a href="https://flare.stormberry.as" class="switcher-card"><img src="https://flare.stormberry.as/favicon.svg" alt="SolarFlare" style="width:32px;height:32px;opacity:0.9;"> <span>SolarFlare</span></a>
-                        <a href="https://meteor.stormberry.as" class="switcher-card"><img src="https://meteor.stormberry.as/favicon.svg" alt="MeteorWatch" style="width:32px;height:32px;opacity:0.9;"> <span>MeteorWatch</span></a>
-                        <a href="https://eclipse.stormberry.as" class="switcher-card"><img src="https://eclipse.stormberry.as/favicon.svg" alt="EclipseTracker" style="width:32px;height:32px;opacity:0.9;"> <span>EclipseTracker</span></a>
-                        <a href="https://nightmode.stormberry.as" class="switcher-card"><img src="https://nightmode.stormberry.as/favicon.svg" alt="NightModeScheduler" style="width:32px;height:32px;opacity:0.9;"> <span>NightModeScheduler</span></a>
-                        <a href="https://weather.stormberry.as" class="switcher-card"><img src="https://weather.stormberry.as/favicon.svg" alt="WeatherWhisper" style="width:32px;height:32px;opacity:0.9;"> <span>WeatherWhisper</span></a>
-                        <a href="https://eco.stormberry.as" class="switcher-card"><img src="https://eco.stormberry.as/favicon.svg" alt="EcoCompass" style="width:32px;height:32px;opacity:0.9;"> <span>EcoCompass</span></a>
-                        <a href="https://username.stormberry.as" class="switcher-card"><img src="https://username.stormberry.as/favicon.svg" alt="UsernameGenerator" style="width:32px;height:32px;opacity:0.9;"> <span>UsernameGenerator</span></a>
+                        <a href="https://stormberry.as/labs.html" class="switcher-card"><img src="/switcher-icons/labs.svg" alt="Labs" style="width:32px;height:32px;opacity:0.9;"> <span>Stormberry Labs</span></a>
+                        <a href="https://scheduler.stormberry.as" class="switcher-card"><img src="/switcher-icons/scheduler.svg" alt="ServiceScheduler" style="width:32px;height:32px;opacity:0.9;"> <span>ServiceScheduler</span></a>
+                        <a href="https://sun.stormberry.as" class="switcher-card"><img src="/switcher-icons/sun.svg" alt="SunApp" style="width:32px;height:32px;opacity:0.9;"> <span>SunApp</span></a>
+                        <a href="https://moon.stormberry.as" class="switcher-card"><img src="/switcher-icons/moon.svg" alt="MoonApp" style="width:32px;height:32px;opacity:0.9;"> <span>MoonApp</span></a>
+                        <a href="https://photo.stormberry.as" class="switcher-card"><img src="/switcher-icons/photo.svg" alt="PhotoTimer" style="width:32px;height:32px;opacity:0.9;"> <span>PhotoTimer</span></a>
+                        <a href="https://garden.stormberry.as" class="switcher-card"><img src="/switcher-icons/garden.svg" alt="LunarGarden" style="width:32px;height:32px;opacity:0.9;"> <span>LunarGarden</span></a>
+                        <a href="https://planet.stormberry.as" class="switcher-card"><img src="/switcher-icons/planet.svg" alt="PlanetPulse" style="width:32px;height:32px;opacity:0.9;"> <span>PlanetPulse</span></a>
+                        <a href="https://star.stormberry.as" class="switcher-card"><img src="/switcher-icons/star.svg" alt="StarMap" style="width:32px;height:32px;opacity:0.9;"> <span>StarMap</span></a>
+                        <a href="https://tide.stormberry.as" class="switcher-card"><img src="/switcher-icons/tide.svg" alt="TideTracker" style="width:32px;height:32px;opacity:0.9;"> <span>TideTracker</span></a>
+                        <a href="https://astro.stormberry.as" class="switcher-card"><img src="/switcher-icons/astro.svg" alt="AstroQuiz" style="width:32px;height:32px;opacity:0.9;"> <span>AstroQuiz</span></a>
+                        <a href="https://beer.stormberry.as" class="switcher-card"><img src="/switcher-icons/beer.svg" alt="CheapBeer" style="width:32px;height:32px;opacity:0.9;"> <span>CheapBeer</span></a>
+                        <a href="https://flare.stormberry.as" class="switcher-card"><img src="/switcher-icons/flare.svg" alt="SolarFlare" style="width:32px;height:32px;opacity:0.9;"> <span>SolarFlare</span></a>
+                        <a href="https://meteor.stormberry.as" class="switcher-card"><img src="/switcher-icons/meteor.svg" alt="MeteorWatch" style="width:32px;height:32px;opacity:0.9;"> <span>MeteorWatch</span></a>
+                        <a href="https://eclipse.stormberry.as" class="switcher-card"><img src="/switcher-icons/eclipse.svg" alt="EclipseTracker" style="width:32px;height:32px;opacity:0.9;"> <span>EclipseTracker</span></a>
+                        <a href="https://nightmode.stormberry.as" class="switcher-card"><img src="/switcher-icons/nightmode.svg" alt="NightModeScheduler" style="width:32px;height:32px;opacity:0.9;"> <span>NightModeScheduler</span></a>
+                        <a href="https://weather.stormberry.as" class="switcher-card"><img src="/switcher-icons/weather.svg" alt="WeatherWhisper" style="width:32px;height:32px;opacity:0.9;"> <span>WeatherWhisper</span></a>
+                        <a href="https://eco.stormberry.as" class="switcher-card"><img src="/switcher-icons/eco.svg" alt="EcoCompass" style="width:32px;height:32px;opacity:0.9;"> <span>EcoCompass</span></a>
+                        <a href="https://username.stormberry.as" class="switcher-card"><img src="/switcher-icons/username.svg" alt="UsernameGenerator" style="width:32px;height:32px;opacity:0.9;"> <span>UsernameGenerator</span></a>
+                        <a href="https://stormberry.as/labs.html" class="switcher-card"><img src="/switcher-icons/labs.svg" alt="Labs" style="width:32px;height:32px;opacity:0.9;"> <span>Stormberry Labs</span></a>
+                        <a href="https://scheduler.stormberry.as" class="switcher-card"><img src="/switcher-icons/scheduler.svg" alt="ServiceScheduler" style="width:32px;height:32px;opacity:0.9;"> <span>ServiceScheduler</span></a>
+                        <a href="https://sun.stormberry.as" class="switcher-card"><img src="/switcher-icons/sun.svg" alt="SunApp" style="width:32px;height:32px;opacity:0.9;"> <span>SunApp</span></a>
+                        <a href="https://moon.stormberry.as" class="switcher-card"><img src="/switcher-icons/moon.svg" alt="MoonApp" style="width:32px;height:32px;opacity:0.9;"> <span>MoonApp</span></a>
+                        <a href="https://photo.stormberry.as" class="switcher-card"><img src="/switcher-icons/photo.svg" alt="PhotoTimer" style="width:32px;height:32px;opacity:0.9;"> <span>PhotoTimer</span></a>
+                        <a href="https://garden.stormberry.as" class="switcher-card"><img src="/switcher-icons/garden.svg" alt="LunarGarden" style="width:32px;height:32px;opacity:0.9;"> <span>LunarGarden</span></a>
+                        <a href="https://planet.stormberry.as" class="switcher-card"><img src="/switcher-icons/planet.svg" alt="PlanetPulse" style="width:32px;height:32px;opacity:0.9;"> <span>PlanetPulse</span></a>
+                        <a href="https://star.stormberry.as" class="switcher-card"><img src="/switcher-icons/star.svg" alt="StarMap" style="width:32px;height:32px;opacity:0.9;"> <span>StarMap</span></a>
+                        <a href="https://tide.stormberry.as" class="switcher-card"><img src="/switcher-icons/tide.svg" alt="TideTracker" style="width:32px;height:32px;opacity:0.9;"> <span>TideTracker</span></a>
+                        <a href="https://astro.stormberry.as" class="switcher-card"><img src="/switcher-icons/astro.svg" alt="AstroQuiz" style="width:32px;height:32px;opacity:0.9;"> <span>AstroQuiz</span></a>
+                        <a href="https://beer.stormberry.as" class="switcher-card"><img src="/switcher-icons/beer.svg" alt="CheapBeer" style="width:32px;height:32px;opacity:0.9;"> <span>CheapBeer</span></a>
+                        <a href="https://flare.stormberry.as" class="switcher-card"><img src="/switcher-icons/flare.svg" alt="SolarFlare" style="width:32px;height:32px;opacity:0.9;"> <span>SolarFlare</span></a>
+                        <a href="https://meteor.stormberry.as" class="switcher-card"><img src="/switcher-icons/meteor.svg" alt="MeteorWatch" style="width:32px;height:32px;opacity:0.9;"> <span>MeteorWatch</span></a>
+                        <a href="https://eclipse.stormberry.as" class="switcher-card"><img src="/switcher-icons/eclipse.svg" alt="EclipseTracker" style="width:32px;height:32px;opacity:0.9;"> <span>EclipseTracker</span></a>
+                        <a href="https://nightmode.stormberry.as" class="switcher-card"><img src="/switcher-icons/nightmode.svg" alt="NightModeScheduler" style="width:32px;height:32px;opacity:0.9;"> <span>NightModeScheduler</span></a>
+                        <a href="https://weather.stormberry.as" class="switcher-card"><img src="/switcher-icons/weather.svg" alt="WeatherWhisper" style="width:32px;height:32px;opacity:0.9;"> <span>WeatherWhisper</span></a>
+                        <a href="https://eco.stormberry.as" class="switcher-card"><img src="/switcher-icons/eco.svg" alt="EcoCompass" style="width:32px;height:32px;opacity:0.9;"> <span>EcoCompass</span></a>
+                        <a href="https://username.stormberry.as" class="switcher-card"><img src="/switcher-icons/username.svg" alt="UsernameGenerator" style="width:32px;height:32px;opacity:0.9;"> <span>UsernameGenerator</span></a>
                     </div>
                 </div>
             </div>

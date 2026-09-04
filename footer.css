@@ -184,6 +184,23 @@
     margin-bottom: 1rem;
 }
 
+.cli-guide h4 {
+    font-size: 0.95rem;
+    margin: 1.25rem 0 0.4rem;
+    color: var(--text-main, #e5e7eb);
+}
+
+.cli-guide .cli-note {
+    font-size: 0.85rem;
+}
+
+.cli-guide code {
+    font-family: monospace;
+    background: rgba(0,0,0,0.35);
+    padding: 0 0.25rem;
+    border-radius: 3px;
+}
+
 .cli-guide pre {
     background: rgba(0,0,0,0.4);
     padding: 1rem;

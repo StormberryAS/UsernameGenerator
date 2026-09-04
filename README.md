@@ -179,15 +179,52 @@ python3 -m http.server 8000
 Open `http://localhost:8000` in your browser.
 
 ### Terminal Integration
-You can link the engine globally to use it natively in your bash/zsh shell:
-```bash
-curl -O https://github.com/StormberryAS/UsernameGenerator/raw/main/username.py
-chmod +x username.py
-ln -s "$(pwd)/username.py" ~/.local/bin/username
 
-# Usage (e.g., 3 words in Portuguese)
+`username.py` needs Python 3 and nothing else: no packages to install, and it never touches
+the network. It does need its word lists, which live in a `data/` folder that must sit beside
+the script, so install the whole tree rather than the single file.
+
+**Linux and macOS**
+
+```bash
+mkdir -p ~/.local/share/username-generator ~/.local/bin
+curl -fsSL https://github.com/StormberryAS/UsernameGenerator/archive/refs/heads/main.tar.gz \
+  | tar -xz --strip-components=1 -C ~/.local/share/username-generator
+chmod +x ~/.local/share/username-generator/username.py
+ln -sf ~/.local/share/username-generator/username.py ~/.local/bin/username
+
+# macOS does not put ~/.local/bin on PATH. Most Linux distributions do.
+# If "username" is not found, add this line to ~/.zshrc or ~/.bashrc:
+export PATH="$HOME/.local/bin:$PATH"
+
+# Usage: 3 words in Portuguese
 username 3 pt
 ```
+
+The symlink is safe: the script resolves its own real path before looking for `data/`, so it
+finds the word lists through the link.
+
+**Windows (PowerShell)**
+
+```powershell
+$dir = "$env:LOCALAPPDATA\UsernameGenerator"
+New-Item -ItemType Directory -Force -Path $dir | Out-Null
+Invoke-WebRequest https://github.com/StormberryAS/UsernameGenerator/archive/refs/heads/main.zip -OutFile "$env:TEMP\ug.zip"
+Expand-Archive "$env:TEMP\ug.zip" -DestinationPath "$env:TEMP\ug" -Force
+Copy-Item "$env:TEMP\ug\UsernameGenerator-main\*" $dir -Recurse -Force
+
+# a small wrapper so you can type "username" instead of "py username.py"
+Set-Content "$dir\username.cmd" '@py "%~dp0username.py" %*'
+
+# add it to your PATH once, then open a new terminal
+[Environment]::SetEnvironmentVariable('Path',
+  [Environment]::GetEnvironmentVariable('Path','User') + ";$dir", 'User')
+
+username 3 pt
+```
+
+**To update**, re-run the download step. **To uninstall**, delete the install directory and the
+`username` link, plus `~/.config/username_generator.json` if you want its saved settings gone.
 
 ## Credits
 Built by [Stormberry AS](https://stormberry.as). Proudly powered by sovereign AI agents.
