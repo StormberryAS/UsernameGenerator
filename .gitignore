@@ -29,3 +29,8 @@ android/app/src/main/assets/data/
 .idea/
 .DS_Store
 *.swp
+
+# Secrets (zsp offers to persist SIGN_WITH here; never commit it)
+.env
+.env.*
+!.env.example
