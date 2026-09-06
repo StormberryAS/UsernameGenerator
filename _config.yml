@@ -13,7 +13,12 @@ exclude:
   - tools/
   - NOTICE
   - DISCLAIMER.md
+  - bump_assets.py
+  - PRIVACY.md
 
 # data/ is deliberately NOT excluded: script.js fetches data/<lang>_<cat>.txt and
 # data/entropy-model.tsv from the live site at runtime, so excluding it would 404
 # every dictionary and leave the generator serving its fallback word forever.
+# bump_assets.py and PRIVACY.md added 2026-09-05: both were still reachable from the
+# live site. privacy.html is the PUBLISHED page and stays served; only its Markdown
+# source is withheld, the same rule DISCLAIMER.md already follows.
