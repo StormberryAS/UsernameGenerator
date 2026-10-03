@@ -126,13 +126,17 @@ android {
         // on Releases. Android refuses an update at an unchanged versionCode, so leaving it
         // at 3 would also mean no existing install ever receives the screen.
         //
+        // Sovereign 1.1.2 (code 5), 2026-10-03: the app is unchanged. Zapstore only offers an
+        // update when the version rises, so republishing 1.1.1 with the refreshed listing
+        // reached no installed phone. Code 5 is free here: Play is a different package.
+        //
         // Play 1.2.0 (code 5). Play only requires monotonicity within its own package, so
         // nothing forces the two lines to track each other. What MUST stay true is the
         // mapping, kept in the release table in README.md: every Play upload is built from a
         // sovereign tag that shipped on GitHub Releases, same code, different application ID
         // and different signature. Never respin Play from an untagged tree.
-        versionCode = if (playBuild) 5 else 4
-        versionName = if (playBuild) "1.2.0" else "1.1.1"
+        versionCode = if (playBuild) 5 else 5
+        versionName = if (playBuild) "1.2.0" else "1.1.2"
 
         // No instrumentation tests, no test runner, nothing that pulls in extra permissions.
         // Density-split PNGs are generated at build time from vectors and are a source of

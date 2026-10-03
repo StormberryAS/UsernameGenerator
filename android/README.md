@@ -184,6 +184,7 @@ mapping:
 |---|---|---|---|
 | `android-v1.1.0` | 1.1.0 (code 3) | not published | n/a |
 | `android-v1.1.1` | 1.1.1 (code 4) | 1.2.0 (code 5) | yes |
+| `android-v1.1.2` | 1.1.2 (code 5) | not published | n/a: app unchanged, cut so Zapstore offers the refreshed listing |
 
 **Every Play upload is built from a tag that shipped on GitHub Releases.** Never respin Play
 from an untagged tree; bump, tag, and add a row here. Order of operations: bump, tag, let CI
