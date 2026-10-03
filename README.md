@@ -3,7 +3,7 @@
 Secure, inspiring, and dynamic identity generation for the modern web. The UsernameGenerator is a self-hosted, highly customizable CLI utility and web application. Designed with a focus on positivity and cross-cultural reach, it algorithmically constructs memorable, high-impact usernames using curated dictionaries.
 
 **Live:** [username.stormberry.as](https://username.stormberry.as)
-**Android:** signed APK on the [Releases page](https://github.com/StormberryAS/UsernameGenerator/releases). Zero permissions, no network. Build and verification notes in [`android/README.md`](android/README.md).
+**Android:** get it on [Zapstore](https://zapstore.dev/apps/no.stormberry.usernamegenerator) or [Google Play](https://play.google.com/store/apps/details?id=no.stormberry.usernamegenerator.play), or download the signed APK from the [Releases page](https://github.com/StormberryAS/UsernameGenerator/releases). Zero permissions, no network. The Google Play copy is a separate package, `no.stormberry.usernamegenerator.play`; [PRIVACY.md](PRIVACY.md) explains the difference. Build and verification notes in [`android/README.md`](android/README.md).
 
 ## Features
 - **11 Supported Languages**: English (`en`), Portuguese (`pt`), Spanish (`es`), Norwegian (`no`), Latin (`la`), German (`de`), French (`fr`), Italian (`it`), Polish (`pl`), Dutch (`nl`), Romanian (`ro`).

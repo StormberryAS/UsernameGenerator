@@ -416,6 +416,71 @@ input:disabled, select:disabled {
 /* Reads as a statement of fact when you are already there, not as a nudge. */
 .max-hint.is-max { color: var(--accent-3); }
 
+/* Android app store links ---------------------------------------------------
+   Same quiet outlined pill as Max entropy, a little larger so it is an easy tap
+   target. Plain text on purpose: no official store badge artwork, and nothing
+   loaded from the stores' own servers. Added 2026-10-02. */
+.store-links {
+    margin-top: 2.5rem;
+    text-align: center;
+}
+
+.store-links h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+}
+
+.store-links p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.store-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.store-link {
+    display: inline-block;
+    padding: 0.6rem 1.1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    transition: border-color 0.16s ease, color 0.16s ease;
+}
+
+.store-link:hover,
+.store-link:focus-visible {
+    border-color: var(--accent-3);
+    color: var(--accent-3);
+}
+
+.store-link:focus-visible {
+    outline: 2px solid var(--accent-3);
+    outline-offset: 2px;
+}
+
+/* Read by screen readers, not shown. */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 /* Footer legibility. Without this the Privacy and Disclaimer links fall back to
    the browser default #0000EE, which is about 2.1:1 on this footer and fails WCAG
    AA. Uses the same accent as the credit links above rather than a new colour.

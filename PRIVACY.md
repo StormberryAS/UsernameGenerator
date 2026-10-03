@@ -44,17 +44,12 @@ Static files. No cookies, no local storage, no analytics and no third-party scri
 frames. The generator, its fonts and its word lists are served from this site and nowhere
 else, and everything you generate happens in your browser and stays there.
 
-One thing to be precise about, because "no tracking" would otherwise be doing work it has
-not earned: the "Explore the Stormberry Ecosystem" strip at the bottom of the page shows the
-icons of our other apps, and each of those icons is fetched from the subdomain it belongs
-to. Those are Stormberry's own servers rather than a third party, but they are separate
-hosts, so loading this page does put your IP address and browser string into their access
-logs before you have clicked anything. No cookies are set and nothing is measured; if you
-would rather not have that, the Android app makes no network connections at all.
+GitHub Pages stores the site and keeps its own logs; Cloudflare delivers it on our behalf
+and keeps short-lived logs.
 
-The site is served by our hosting and CDN providers, which log connections the way any web
-server does. That is their processing and their retention, not ours, and we add no
-measurement of our own on top of it.
+Your data protection rights, and how to complain to Datatilsynet (the Norwegian Data
+Protection Authority), are set out at
+[stormberry.as/privacy](https://stormberry.as/privacy).
 
 ## Where you got the app
 
@@ -85,4 +80,4 @@ application changes in the same release.
 The company policy covering the stormberry.as website and its contact form is a separate
 document at [stormberry.as/privacy.html](https://stormberry.as/privacy.html).
 
-*Last updated 3 September 2026.*
+*Last updated 2 October 2026.*
