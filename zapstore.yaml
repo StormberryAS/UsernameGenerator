@@ -23,7 +23,7 @@ description: |
   network access, no storage access and nothing to phone home with. Check it
   yourself before installing:
 
-      aapt dump permissions UsernameGenerator-v1.1.0.apk
+      aapt dump permissions <the APK you downloaded>
 
   The only line you should see is the package name.
 
@@ -87,8 +87,10 @@ icon: ./fastlane/metadata/android/en-US/images/icon.png
 # Captured on an API 36 emulator at 1080x2400. zsp uploads these to Blossom and
 # references them from the kind 32267 app event.
 images:
-  - ./android/screenshots/01-generate.png
-  - ./android/screenshots/02-recent.png
+  - ./fastlane/metadata/android/en-US/images/phoneScreenshots/01-generatephone.png
+  - ./fastlane/metadata/android/en-US/images/phoneScreenshots/02-controlsphone.png
+  - ./fastlane/metadata/android/en-US/images/phoneScreenshots/03-recentphone.png
+  - ./fastlane/metadata/android/en-US/images/phoneScreenshots/04-privacyphone.png
 
 # No release_source: zsp pulls the APK straight from the GitHub release, so the
 # asset URL in the nostr event points at the same signed binary the release page
