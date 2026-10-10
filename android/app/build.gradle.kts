@@ -130,13 +130,17 @@ android {
         // update when the version rises, so republishing 1.1.1 with the refreshed listing
         // reached no installed phone. Code 5 is free here: Play is a different package.
         //
+        // Sovereign 1.1.3 (code 6) and Play 1.2.1 (code 6), 2026-10-10: Inter. The app is set
+        // in the typeface username.stormberry.as self-hosts, bundled in res/font. Both lines
+        // move together because the app itself changed; Play's next code had to be 6 or more.
+        //
         // Play 1.2.0 (code 5). Play only requires monotonicity within its own package, so
         // nothing forces the two lines to track each other. What MUST stay true is the
         // mapping, kept in the release table in README.md: every Play upload is built from a
         // sovereign tag that shipped on GitHub Releases, same code, different application ID
         // and different signature. Never respin Play from an untagged tree.
-        versionCode = if (playBuild) 5 else 5
-        versionName = if (playBuild) "1.2.0" else "1.1.2"
+        versionCode = if (playBuild) 6 else 6
+        versionName = if (playBuild) "1.2.1" else "1.1.3"
 
         // No instrumentation tests, no test runner, nothing that pulls in extra permissions.
         // Density-split PNGs are generated at build time from vectors and are a source of

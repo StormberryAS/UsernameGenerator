@@ -24,7 +24,7 @@ Deep-Translator
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
 
-Inter (fonts/inter/)
+Inter (fonts/inter/, and android/app/src/main/res/font/ in the Android app)
   License:   SIL Open Font License 1.1 (OFL-1.1)
   Author:    Rasmus Andersson
   Source:    https://rsms.me/inter/
@@ -32,3 +32,7 @@ Inter (fonts/inter/)
 
   This Font Software is licensed under the SIL Open Font License, Version 1.1.
   Full license text: https://scripts.sil.org/OFL
+
+  The Android app bundles four static instances of fonts/inter/InterVariable.woff2
+  (Regular, Medium, SemiBold and Bold), cut by android/tools/build-inter-fonts.py.
+  Each keeps the original's copyright and licence records (name IDs 0, 13, 14).
