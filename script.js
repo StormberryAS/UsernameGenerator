@@ -1,19 +1,56 @@
-const outputBox = document.getElementById('output');
-const generateBtn = document.getElementById('generateBtn');
-const copyBtn = document.getElementById('copyBtn');
+/* Types for the TypeScript checker only (see jsconfig.json); the browser ignores them. */
+
+/**
+ * Exact entropy of one (language mode, word type, word count) row of data/entropy-model.tsv.
+ * @typedef {object} EntropyRow
+ * @property {number} hmin  min-entropy in bits
+ * @property {number} h2    collision (Renyi-2) entropy in bits
+ */
+
+/** @typedef {Record<string, Record<string, Record<number, EntropyRow>>>} EntropyModel  language, then type, then word count */
+
+/**
+ * The finished readout figures.
+ * @typedef {object} Strength
+ * @property {number} hmin
+ * @property {number} h2
+ * @property {string} bitsText      one decimal place, for example "36.7"
+ * @property {string} combinations  for example "1.2 trillion"
+ * @property {string} collisionAt   for example "1.4 million"
+ */
+
+/**
+ * The strongest settings, as maxEntropyOptions computes them.
+ * @typedef {object} MaxOptions
+ * @property {string} language
+ * @property {string} type
+ * @property {number} words
+ * @property {boolean} addDigits
+ * @property {number} digitCount
+ * @property {string} separator
+ * @property {Strength} strength
+ */
+
+/* The page loads this script last. Elements the code below uses unguarded are cast to
+   their element type, which only drops the null getElementById allows for a missing id.
+   Elements the code already guards with a null check keep "| null", so the checker holds
+   it to those guards. */
+const outputBox = /** @type {HTMLElement} */ (document.getElementById('output'));
+const generateBtn = /** @type {HTMLButtonElement} */ (document.getElementById('generateBtn'));
+const copyBtn = /** @type {HTMLButtonElement} */ (document.getElementById('copyBtn'));
 
 // Controls
-const wordsInput = document.getElementById('words');
-const typeInput = document.getElementById('type');
-const langInput = document.getElementById('lang');
-const separatorInput = document.getElementById('separator');
-const digitsInput = document.getElementById('digits');
-const digitPositionInput = document.getElementById('digitPosition');
-const digitCountInput = document.getElementById('digitCount');
+const wordsInput = /** @type {HTMLInputElement} */ (document.getElementById('words'));
+const typeInput = /** @type {HTMLSelectElement} */ (document.getElementById('type'));
+const langInput = /** @type {HTMLSelectElement} */ (document.getElementById('lang'));
+const separatorInput = /** @type {HTMLSelectElement} */ (document.getElementById('separator'));
+const digitsInput = /** @type {HTMLInputElement | null} */ (document.getElementById('digits'));
+const digitPositionInput = /** @type {HTMLSelectElement | null} */ (document.getElementById('digitPosition'));
+const digitCountInput = /** @type {HTMLInputElement | null} */ (document.getElementById('digitCount'));
 const strengthBitsBox = document.getElementById('strengthBits');
-const strengthDetailBox = document.getElementById('strengthDetail');
+const strengthDetailBox = /** @type {HTMLElement} */ (document.getElementById('strengthDetail'));
 const maxHintBox = document.getElementById('maxHint');
-const maxEntropyBtn = document.getElementById('maxEntropyBtn');
+const maxEntropyBtn = /** @type {HTMLButtonElement | null} */ (document.getElementById('maxEntropyBtn'));
 
 // The controls that only mean anything while digits are switched on. Collected by
 // class rather than listed by id, so the sync helper below does not need editing
@@ -21,8 +58,14 @@ const maxEntropyBtn = document.getElementById('maxEntropyBtn');
 const digitOptionGroups = document.querySelectorAll('.digit-option');
 
 // Cache for dictionaries
+/** @type {Record<string, string[]>} */
 const dictCache = {};
 
+/**
+ * @param {string} lang  a real language code such as "en"
+ * @param {string} type  "noun", "adjective" or "verb"
+ * @returns {Promise<string[]>}
+ */
 async function fetchDict(lang, type) {
     const key = `${lang}_${type}s`;
     if (dictCache[key]) return dictCache[key];
@@ -46,6 +89,7 @@ async function fetchDict(lang, type) {
 // its o-slash and "sokol" keeps its l-stroke, which defeats the whole point of
 // producing platform-agnostic usernames. Keep this table in sync with the identical
 // ones in username.py and android/.../UsernameEngine.kt.
+/** @type {Record<string, string>} */
 const TRANSLITERATE = {
     '\u00f8': 'o',   // o with stroke, Norwegian/Danish
     '\u0142': 'l',   // l with stroke, Polish
@@ -58,6 +102,10 @@ const TRANSLITERATE = {
     '\u0131': 'i'    // dotless i
 };
 
+/**
+ * @param {string} value
+ * @returns {string}
+ */
 function sanitize(value) {
     const mapped = Array.from(value).map(c => TRANSLITERATE[c] !== undefined ? TRANSLITERATE[c] : c).join('');
     return mapped.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -74,6 +122,9 @@ function sanitize(value) {
  * Rejection sampling rather than a modulo, because a plain remainder biases towards
  * the low values whenever max does not divide 2^32 evenly. Small at these list
  * sizes, and free to avoid.
+ *
+ * @param {number} max  exclusive upper bound, at least 1
+ * @returns {number}
  */
 function randomInt(max) {
     const limit = Math.floor(0xFFFFFFFF / max) * max;
@@ -83,6 +134,10 @@ function randomInt(max) {
     return v % max;
 }
 
+/**
+ * @param {string[]} list
+ * @returns {string}
+ */
 function getRandomWord(list) {
     return list[randomInt(list.length)];
 }
@@ -101,6 +156,8 @@ function getRandomWord(list) {
  *
  * Digits also make the "none" separator readable again, because the runs mark where
  * one word ends and the next begins.
+ *
+ * @returns {number}
  */
 function randomDigit() {
     return randomInt(10);
@@ -138,6 +195,12 @@ const SEPARATOR_RANDOM = 'random';
 const SEPARATOR_MIX = 'mix';
 const SEPARATOR_VALUES = ['', '-', '_', '.'];
 
+/**
+ * @param {number} gapCount
+ * @param {string} separator              a SEPARATOR_VALUES entry, SEPARATOR_RANDOM or SEPARATOR_MIX
+ * @param {() => number} pickSeparator    index into SEPARATOR_VALUES
+ * @returns {string[]} one separator per gap
+ */
 function resolveSeparators(gapCount, separator, pickSeparator) {
     if (separator === SEPARATOR_MIX) {
         return Array.from({ length: gapCount }, () => SEPARATOR_VALUES[pickSeparator()]);
@@ -150,7 +213,8 @@ function resolveSeparators(gapCount, separator, pickSeparator) {
     return Array(gapCount).fill(separator);
 }
 
-/** A uniform separator index from the CSPRNG. */
+/** A uniform separator index from the CSPRNG.
+ *  @returns {number} */
 function randomSeparatorIndex() {
     return randomInt(SEPARATOR_VALUES.length);
 }
@@ -172,6 +236,14 @@ const MAX_DIGIT_COUNT = 5;
  * Every word gets its OWN run of [digitCount] independently drawn digits. Not one run
  * shared across the username, and not one run repeated per word, either of which would
  * hand an observer most of the digits for free once they had seen one word.
+ *
+ * @param {string[]} parts
+ * @param {string} separator
+ * @param {boolean} addDigits
+ * @param {string} digitPosition  DIGIT_POSITION_BEFORE or DIGIT_POSITION_AFTER
+ * @param {number} digitCount
+ * @param {() => number} digit    one digit 0 to 9
+ * @returns {string}
  */
 function assemble(parts, separator, addDigits, digitPosition, digitCount, digit) {
     // Kept so every existing caller and the whole digit contract stay untouched:
@@ -180,7 +252,10 @@ function assemble(parts, separator, addDigits, digitPosition, digitCount, digit)
                         addDigits, digitPosition, digitCount, digit);
 }
 
-/** Joins parts with a possibly different separator in each gap. */
+/** Joins parts with a possibly different separator in each gap.
+ *  @param {string[]} parts
+ *  @param {string[]} separators  one per gap, so parts.length - 1 of them
+ *  @returns {string} */
 function joinParts(parts, separators) {
     let out = '';
     for (let i = 0; i < parts.length; i++) {
@@ -190,6 +265,16 @@ function joinParts(parts, separators) {
     return out;
 }
 
+/**
+ * assemble with one separator per gap.
+ * @param {string[]} parts
+ * @param {string[]} separators
+ * @param {boolean} addDigits
+ * @param {string} digitPosition
+ * @param {number} digitCount
+ * @param {() => number} digit
+ * @returns {string}
+ */
 function assembleWith(parts, separators, addDigits, digitPosition, digitCount, digit) {
     // The no-digits branch joins first and sanitises once. Sanitising per word would
     // be equivalent for every dictionary entry we ship, but "equivalent as far as I
@@ -211,6 +296,8 @@ function assembleWith(parts, separators, addDigits, digitPosition, digitCount, d
  * The count input carries min="1" max="5", but those are advisory: a user can type 99,
  * or empty the field, and the element still hands us whatever is in it. Clamping here
  * keeps the 1 to 5 contract true whatever arrives, rather than trusting the browser.
+ *
+ * @returns {number}
  */
 function readDigitCount() {
     const parsed = parseInt(digitCountInput ? digitCountInput.value : '', 10);
@@ -218,7 +305,23 @@ function readDigitCount() {
     return Math.min(MAX_DIGIT_COUNT, Math.max(MIN_DIGIT_COUNT, parsed));
 }
 
-/** Anything that is not an explicit "before" means after, a missing control included. */
+/**
+ * The word count, clamped to the 1 to 5 the field offers, for the same reason as
+ * readDigitCount: min and max on the input are advisory. Unclamped (before
+ * 2026-10-16), 7 typed words gave a 7-word name with a "0.0 bits" readout under mix
+ * and random, 99 gave a 99-word name with repeats, and a negative number threw and
+ * left the output stuck on "Generating...". An empty or zero field keeps its old
+ * default of 2.
+ *
+ * @returns {number}
+ */
+function readWordCount() {
+    const parsed = parseInt(wordsInput.value) || 2;
+    return Math.min(MAX_WORD_COUNT, Math.max(MIN_WORD_COUNT, parsed));
+}
+
+/** Anything that is not an explicit "before" means after, a missing control included.
+ *  @returns {string} */
 function readDigitPosition() {
     return digitPositionInput && digitPositionInput.value === DIGIT_POSITION_BEFORE
         ? DIGIT_POSITION_BEFORE
@@ -282,6 +385,11 @@ const WORD_TYPES = ['mixed', 'noun', 'adjective', 'verb'];
  * can pass a counter where production passes the CSPRNG. Called ONCE for
  * [LANGUAGE_RANDOM] and not at all for a fixed language. **Never pass a
  * predictable source in production.**
+ *
+ * @param {string[]} plan
+ * @param {string} language
+ * @param {() => number} pickLanguage
+ * @returns {string[]}
  */
 function resolveSlotLanguages(plan, language, pickLanguage) {
     if (language === LANGUAGE_RANDOM) {
@@ -291,7 +399,8 @@ function resolveSlotLanguages(plan, language, pickLanguage) {
     return plan.map(() => language);
 }
 
-/** A uniform language index from the CSPRNG, matching randomDigit's contract. */
+/** A uniform language index from the CSPRNG, matching randomDigit's contract.
+ *  @returns {number} */
 function randomLanguageIndex() {
     return randomInt(REAL_LANGUAGES.length);
 }
@@ -354,6 +463,10 @@ const SCALE_NAMES = ['', 'thousand', 'million', 'billion', 'trillion',
  * to one would leave the other quoting bits for a shape the app no longer
  * produced, silently and with no test able to see it. Mirrored by UsernameEngine
  * .categoryPlan and username.py's category_plan.
+ *
+ * @param {number} wordCount
+ * @param {string} type  "mixed", "noun", "adjective" or "verb"
+ * @returns {string[]}
  */
 function categoryPlan(wordCount, type) {
     if (type !== 'mixed') return Array(wordCount).fill(type);
@@ -364,6 +477,7 @@ function categoryPlan(wordCount, type) {
     return plan;
 }
 
+/** @type {Record<string, string[]>} */
 const poolCache = {};
 
 /**
@@ -377,11 +491,14 @@ const poolCache = {};
  * "ninja" about nine times likelier than a word unique to one language, because
  * it sits in 9 of the 11 noun lists, and that cost up to 3.06 bits per word.
  * Drawing from the pool makes every word equally likely and deletes nothing.
+ *
+ * @param {string} category
+ * @returns {Promise<string[]>}
  */
 async function fetchPool(category) {
     if (poolCache[category]) return poolCache[category];
     const lists = await Promise.all(REAL_LANGUAGES.map(lang => fetchDict(lang, category)));
-    poolCache[category] = sanitiseDistinct([].concat(...lists));
+    poolCache[category] = sanitiseDistinct(/** @type {string[]} */ ([]).concat(...lists));
     return poolCache[category];
 }
 
@@ -398,8 +515,12 @@ async function fetchPool(category) {
  * Removing the duplicate at the source fixes both and keeps raw and displayed forms
  * one-to-one, which is what makes the entropy model exact rather than an upper
  * bound. First occurrence wins, so the result is deterministic.
+ *
+ * @param {string[]} words
+ * @returns {string[]}
  */
 function sanitiseDistinct(words) {
+    /** @type {Map<string, string>} */
     const seen = new Map();
     for (const word of words) {
         const key = sanitize(word);
@@ -408,7 +529,11 @@ function sanitiseDistinct(words) {
     return [...seen.values()];
 }
 
-/** Where each slot's words come from. Pooled under mix, a dictionary otherwise. */
+/** Where each slot's words come from. Pooled under mix, a dictionary otherwise.
+ *  @param {string[]} plan
+ *  @param {string} language
+ *  @param {() => number} pickLanguage
+ *  @returns {Promise<string[][]>} */
 async function resolveSources(plan, language, pickLanguage) {
     if (language === LANGUAGE_MIX) {
         return Promise.all(plan.map(category => fetchPool(category)));
@@ -432,6 +557,11 @@ async function resolveSources(plan, language, pickLanguage) {
  */
 const MAX_DRAW_ATTEMPTS = 64;
 
+/**
+ * @param {string[][]} sources       one word list per slot
+ * @param {(list: string[]) => string} pick
+ * @returns {string[]}
+ */
 function drawDistinct(sources, pick) {
     for (let attempt = 0; attempt < MAX_DRAW_ATTEMPTS; attempt++) {
         const words = sources.map(pick);
@@ -440,6 +570,7 @@ function drawDistinct(sources, pick) {
     return sources.map(pick);
 }
 
+/** @type {EntropyModel | null} */
 let entropyModelCache = null;
 
 /**
@@ -448,12 +579,15 @@ let entropyModelCache = null;
  * Returns null if it cannot be read, and every caller treats null as "fall back
  * to the uniform calculation": a missing model should cost the two new modes
  * their accurate figure, never break the whole readout.
+ *
+ * @returns {Promise<EntropyModel | null>}
  */
 async function fetchEntropyModel() {
     if (entropyModelCache) return entropyModelCache;
     try {
         const response = await fetch('data/entropy-model.tsv');
         if (!response.ok) throw new Error('entropy model not found');
+        /** @type {EntropyModel} */
         const model = {};
         for (const line of (await response.text()).split('\n')) {
             if (!line || line.startsWith('#')) continue;
@@ -485,11 +619,17 @@ async function fetchEntropyModel() {
  */
 const ROUND_EPS = 1e-9;
 
+/**
+ * @param {number} value
+ * @returns {number}
+ */
 function roundHalfUp(value) {
     return Math.floor(value + 0.5 + ROUND_EPS);
 }
 
-/** Renders tenths as a decimal, so 28 becomes "2.8", without touching toFixed. */
+/** Renders tenths as a decimal, so 28 becomes "2.8", without touching toFixed.
+ *  @param {number} tenths  a non-negative integer
+ *  @returns {string} */
 function tenthsText(tenths) {
     return Math.floor(tenths / 10) + '.' + (tenths % 10);
 }
@@ -501,6 +641,9 @@ function tenthsText(tenths) {
  * %.1f additionally emits a comma under a Norwegian locale. Integer arithmetic
  * is the only formulation identical in all three, and is the same reason SunApp's
  * solar code uses floor(x + 0.5) rather than round().
+ *
+ * @param {number} value
+ * @returns {string}
  */
 function round1(value) {
     return tenthsText(roundHalfUp(value * 10));
@@ -515,6 +658,9 @@ function round1(value) {
  * the other on 1.0 million, and they then print different words for the same
  * number. Rounding first and normalising afterwards makes the boundary a
  * consequence rather than a race.
+ *
+ * @param {number} log10v
+ * @returns {string}
  */
 function humanFromLog10(log10v) {
     if (log10v < 3.5) {
@@ -554,6 +700,16 @@ function humanFromLog10(log10v) {
  *
  * [sizes] is only the fallback for a missing table: it ignores the no-repeat
  * correction, which is worth about 0.05 bits, and is much better than no readout.
+ *
+ * @param {EntropyModel | null} model
+ * @param {string[]} plan
+ * @param {string} language
+ * @param {string} wordType
+ * @param {number[]} sizes
+ * @param {boolean} addDigits
+ * @param {number} digitCount
+ * @param {string} separator
+ * @returns {Strength}
  */
 function describeStrength(model, plan, language, wordType, sizes, addDigits, digitCount, separator) {
     let hmin = 0;
@@ -604,8 +760,12 @@ function describeStrength(model, plan, language, wordType, sizes, addDigits, dig
  * languages; nouns lose because "ninja", "samurai" and "titan" appear in six to
  * nine of the eleven lists, which costs exactly the unpredictability the mode is
  * supposed to buy. Hardcoding today's winner would quietly become a lie.
+ *
+ * @param {EntropyModel | null} model
+ * @returns {MaxOptions}
  */
 function maxEntropyOptions(model) {
+    /** @type {{ language: string, type: string, strength: Strength } | null} */
     let best = null;
     for (const language of [LANGUAGE_MIX, LANGUAGE_RANDOM, ...REAL_LANGUAGES]) {
         for (const type of WORD_TYPES) {
@@ -615,14 +775,16 @@ function maxEntropyOptions(model) {
             if (!best || strength.hmin > best.strength.hmin) best = { language, type, strength };
         }
     }
+    // The loops above always run (both lists are constant and non-empty), so best is set.
+    const found = /** @type {{ language: string, type: string, strength: Strength }} */ (best);
     return {
-        language: best.language,
-        type: best.type,
+        language: found.language,
+        type: found.type,
         words: MAX_WORD_COUNT,
         addDigits: true,
         digitCount: MAX_DIGIT_COUNT,
         separator: SEPARATOR_MIX,
-        strength: best.strength,
+        strength: found.strength,
     };
 }
 
@@ -634,7 +796,7 @@ function maxEntropyOptions(model) {
  */
 async function updateStrength() {
     if (!strengthBitsBox) return;
-    const numWords = parseInt(wordsInput.value) || 2;
+    const numWords = readWordCount();
     const wordType = typeInput.value;
     const language = langInput.value;
     const plan = categoryPlan(numWords, wordType);
@@ -675,7 +837,9 @@ async function updateStrength() {
     }
 }
 
-/** True for the eleven real languages, false for the two drawing modes. */
+/** True for the eleven real languages, false for the two drawing modes.
+ *  @param {string} value
+ *  @returns {boolean} */
 function isRealLanguage(value) {
     return REAL_LANGUAGES.indexOf(value) >= 0;
 }
@@ -685,7 +849,7 @@ async function generateUsername() {
     outputBox.textContent = 'Generating...';
     generateBtn.style.pointerEvents = 'none';
 
-    const numWords = parseInt(wordsInput.value) || 2;
+    const numWords = readWordCount();
     const type = typeInput.value;
     const lang = langInput.value;
     const separator = separatorInput.value;
@@ -738,8 +902,13 @@ copyBtn.addEventListener('click', () => {
 
 // Generate on click and enter
 generateBtn.addEventListener('click', generateUsername);
+// Not when a button or link has focus: Enter already activates those, so generating
+// here as well made Generate and Max entropy run twice, and made Copy copy nothing,
+// because the new generation had already put the output into its loading state.
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') generateUsername();
+    if (e.key !== 'Enter') return;
+    if (e.target instanceof Element && e.target.closest('button, a')) return;
+    generateUsername();
 });
 
 // Keep position and count in step with the checkbox as soon as it is toggled, not

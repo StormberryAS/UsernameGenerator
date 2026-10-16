@@ -15,6 +15,14 @@ exclude:
   - DISCLAIMER.md
   - bump_assets.py
   - PRIVACY.md
+  # Type-checking tooling, added 2026-10-16. Dev-only: the site is still plain JavaScript
+  # with no build step, so none of this may ever be served. types/ does not exist yet
+  # and is listed so a future declaration file cannot leak.
+  - node_modules/
+  - package.json
+  - package-lock.json
+  - jsconfig.json
+  - types/
 
 # data/ is deliberately NOT excluded: script.js fetches data/<lang>_<cat>.txt and
 # data/entropy-model.tsv from the live site at runtime, so excluding it would 404

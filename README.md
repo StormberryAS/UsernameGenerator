@@ -178,6 +178,14 @@ python3 -m http.server 8000
 ```
 Open `http://localhost:8000` in your browser.
 
+### Type checking
+`script.js` stays plain JavaScript that the browser loads as written, with no build step. Its types live in JSDoc comments, and the TypeScript compiler (6.0.3, pinned) only checks them (`checkJs`, `noEmit`, `strict`).
+
+```bash
+npm ci --ignore-scripts && npm run typecheck
+```
+A clean run prints nothing and exits 0. `package.json`, `package-lock.json`, `jsconfig.json` and `node_modules/` are development files only: `_config.yml` keeps them off the site, and the Android build copies only the word lists and `entropy-model.tsv` from `data/`. The parity generators in `tools/` lift code out of `script.js` by pattern, so keep type annotations on the line above a `const`, never between `=` and its value.
+
 ### Terminal Integration
 
 `username.py` needs Python 3 and nothing else: no packages to install, and it never touches
