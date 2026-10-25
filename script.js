@@ -318,9 +318,11 @@ function maxEntropyOptions(model) {
         strength: found.strength,
     };
 }
+let strengthCalls = 0;
 async function updateStrength() {
     if (!strengthBitsBox)
         return;
+    const call = ++strengthCalls;
     const numWords = readWordCount();
     const wordType = typeInput.value;
     const language = langInput.value;
@@ -330,6 +332,8 @@ async function updateStrength() {
         ? (await Promise.all(plan.map(cat => fetchDict(language, cat)))).map(list => list.length)
         : [];
     const strength = describeStrength(model, plan, language, wordType, sizes, digitsInput ? digitsInput.checked : true, readDigitCount(), separatorInput ? separatorInput.value : '');
+    if (call !== strengthCalls)
+        return;
     strengthBitsBox.textContent = strength.bitsText + ' bits of entropy';
     strengthDetailBox.textContent =
         '1 in ' + strength.combinations + ' combinations · even odds of a repeat after '

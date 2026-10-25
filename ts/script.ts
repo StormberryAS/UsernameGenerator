@@ -718,14 +718,23 @@ function maxEntropyOptions(model: EntropyModel | null): MaxOptions {
     };
 }
 
+/** How many readout updates have started; only the latest may write (see updateStrength). */
+let strengthCalls = 0;
+
 /**
  * Recomputes the readout from whatever the controls currently say.
  *
  * Reads dictionaries through the same cache the generator uses, so after the
  * first generation in a given language this costs nothing and needs no network.
+ *
+ * Every control event starts its own call, and a call that has to fetch (a word
+ * list not cached yet, or an entropy model that failed and is asked for again each
+ * time) can finish after a later one. Only the latest call writes, so a slower
+ * call with older settings can never overwrite a newer readout.
  */
 async function updateStrength() {
     if (!strengthBitsBox) return;
+    const call = ++strengthCalls;
     const numWords = readWordCount();
     const wordType = typeInput.value;
     const language = langInput.value;
@@ -744,6 +753,8 @@ async function updateStrength() {
         readDigitCount(),
         separatorInput ? separatorInput.value : '',
     );
+
+    if (call !== strengthCalls) return;
 
     strengthBitsBox.textContent = strength.bitsText + ' bits of entropy';
     strengthDetailBox.textContent =

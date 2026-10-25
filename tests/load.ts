@@ -169,6 +169,11 @@ export interface LoadedPage {
   randomFrom(fill: (array: Uint32Array<ArrayBuffer>) => void): void;
   /** Addresses (as the page asks for them, for example data/en_nouns.txt) that fetch answers with a 404. */
   missing: Set<string>;
+  /**
+   * Holds back the answer to every fetch whose address starts with this prefix, until the returned
+   * function is called. For races: a slow request for an older setting, finishing after a newer one.
+   */
+  hold(prefix: string): () => void;
   /** Every address the page fetched, in order. */
   readonly fetched: string[];
   /** Every text the page copied. */
@@ -187,6 +192,7 @@ export async function loadPage({ root = PAGE_ROOT, init = false }: { root?: URL;
   const copied: string[] = [];
   const errors: string[] = [];
   const missing = new Set<string>();
+  const held: Array<{ prefix: string; gate: Promise<void> }> = [];
   let fill: (array: Uint32Array<ArrayBuffer>) => void = (array) => { globalThis.crypto.getRandomValues(array); };
   const sandbox: Record<string, unknown> = {
     document: dom,
@@ -198,13 +204,14 @@ export async function loadPage({ root = PAGE_ROOT, init = false }: { root?: URL;
     console: { error: (...args: unknown[]): void => { errors.push(args.map(String).join(' ')); }, log: console.log },
     crypto: { getRandomValues: (array: Uint32Array<ArrayBuffer>): Uint32Array<ArrayBuffer> => { fill(array); return array; } },
     setTimeout: (fn: () => void): number => timers.push(fn),
-    fetch: (url: string): Promise<{ ok: boolean; text(): Promise<string> }> => {
+    fetch: async (url: string): Promise<{ ok: boolean; text(): Promise<string> }> => {
       fetched.push(url);
+      for (const h of held) if (url.startsWith(h.prefix)) await h.gate;
       let text: string | null = null;
       if (!missing.has(url)) {
         try { text = readFileSync(new URL(url, root), 'utf8'); } catch { text = null; }
       }
-      return Promise.resolve({ ok: text !== null, text: () => Promise.resolve(text ?? '') });
+      return { ok: text !== null, text: () => Promise.resolve(text ?? '') };
     },
   };
   const ctx = vm.createContext(sandbox);
@@ -234,6 +241,11 @@ export async function loadPage({ root = PAGE_ROOT, init = false }: { root?: URL;
       throw new Error('the page keeps scheduling timers');
     },
     randomFrom: (f) => { fill = f; },
+    hold: (prefix) => {
+      let release = (): void => {};
+      held.push({ prefix, gate: new Promise<void>((r) => { release = r; }) });
+      return release;
+    },
     missing,
     fetched,
     copied,

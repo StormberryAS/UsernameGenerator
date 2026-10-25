@@ -247,3 +247,36 @@ test('Copy puts the shown username on the clipboard; Enter generates unless a bu
   await p.flush();
   assert.ok(p.fetched.length >= before);
 });
+
+test('updateStrength: only the latest call writes, whatever order the calls finish in', async () => {
+  const readout = (p: Awaited<ReturnType<typeof loadPage>>): string =>
+    defined(p.dom.getElementById('strengthBits').textContent, 'strengthBits') + ' | ' + defined(p.dom.getElementById('strengthDetail').textContent, 'strengthDetail');
+  // What each setting reads on its own, on pages with nothing held back.
+  const alone = async (lang: string): Promise<string> => {
+    const q = await loadPage();
+    q.dom.getElementById('lang').value = lang;
+    await q.fn('updateStrength')();
+    return readout(q);
+  };
+  const english = await alone('en');
+  const random = await alone('random');
+  assert.notEqual(english, random, 'the two settings must read differently for the race to show');
+
+  // A real language whose word lists are not cached yet is slow; the person then moves on to
+  // random, which needs no list. The slow call finishes last and must not overwrite the newer readout.
+  const p = await loadPage();
+  const release = p.hold('data/en_');
+  p.dom.getElementById('lang').value = 'en';
+  const slow = p.fn('updateStrength')();
+  p.dom.getElementById('lang').value = 'random';
+  await p.fn('updateStrength')();
+  assert.equal(readout(p), random, 'the newer call wrote');
+  release();
+  await slow;
+  assert.equal(readout(p), random, 'the older call, finishing late, wrote nothing');
+
+  // And the reverse order, with nothing held: each call writes, the later one last.
+  p.dom.getElementById('lang').value = 'en';
+  await p.fn('updateStrength')();
+  assert.equal(readout(p), english);
+});
