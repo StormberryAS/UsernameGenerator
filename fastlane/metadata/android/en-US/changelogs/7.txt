@@ -1,0 +1,7 @@
+A new top and bottom for the main screen, matching the other Stormberry apps.
+
+- The mark, name and tagline are centred; the tagline is the website's.
+- The footer credits the project the word lists were built with. It also has the Stormberry icon row and a privacy line you can test by going offline.
+- Footer links, except Privacy, open in another app. The app still declares no permissions.
+
+Full release log: https://github.com/StormberryAS/UsernameGenerator/blob/main/CHANGELOG.md

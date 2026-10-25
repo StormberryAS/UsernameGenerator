@@ -12,6 +12,7 @@ exclude:
   - fastlane/
   - tools/
   - NOTICE
+  - CHANGELOG.md
   - DISCLAIMER.md
   - bump_assets.py
   - PRIVACY.md

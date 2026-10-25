@@ -134,13 +134,18 @@ android {
         // in the typeface username.stormberry.as self-hosts, bundled in res/font. Both lines
         // move together because the app itself changed; Play's next code had to be 6 or more.
         //
+        // Sovereign 1.1.4 (code 7) and Play 1.2.2 (code 7), 2026-10-24: the CheckLink top and
+        // bottom. The main screen gets a centred hero and the Stormberry footer with its credits,
+        // and the website now ships the opt-in offline pilot. Both lines move together because
+        // the app itself changed; Play's next code had to be 7 or more, and it is the same code.
+        //
         // Play 1.2.0 (code 5). Play only requires monotonicity within its own package, so
         // nothing forces the two lines to track each other. What MUST stay true is the
         // mapping, kept in the release table in README.md: every Play upload is built from a
         // sovereign tag that shipped on GitHub Releases, same code, different application ID
         // and different signature. Never respin Play from an untagged tree.
-        versionCode = if (playBuild) 6 else 6
-        versionName = if (playBuild) "1.2.1" else "1.1.3"
+        versionCode = if (playBuild) 7 else 7
+        versionName = if (playBuild) "1.2.2" else "1.1.4"
 
         // No instrumentation tests, no test runner, nothing that pulls in extra permissions.
         // Density-split PNGs are generated at build time from vectors and are a source of

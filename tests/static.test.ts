@@ -54,7 +54,7 @@ test('every local script and stylesheet carries the ?v= stamp of its current byt
 test('_config.yml keeps sources, tooling and tests off the site, and publishes the app', () => {
   const cfg = read('_config.yml');
   const excluded = [...cfg.matchAll(/^ {2}- (\S+)$/gm)].map((m) => m[1]);
-  for (const x of ['ts/', 'tools/', 'tests/', 'node_modules/', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.sw.json', '.npmrc', 'bump_assets.py', 'README.md', 'DISCLAIMER.md', 'PRIVACY.md', 'LICENSE', 'NOTICE', 'android/', 'fastlane/', 'zapstore.yaml', 'username.py', 'build_dicts.py', 'build_dicts_robust.py']) {
+  for (const x of ['ts/', 'tools/', 'tests/', 'node_modules/', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.sw.json', '.npmrc', 'bump_assets.py', 'README.md', 'CHANGELOG.md', 'DISCLAIMER.md', 'PRIVACY.md', 'LICENSE', 'NOTICE', 'android/', 'fastlane/', 'zapstore.yaml', 'username.py', 'build_dicts.py', 'build_dicts_robust.py']) {
     assert.ok(excluded.includes(x), `${x} is excluded`);
   }
   // The page fetches data/ at run time, and loads script.js, so neither may ever be excluded.
