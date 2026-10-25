@@ -241,7 +241,15 @@ username 3 pt
 ## Credits
 Built by [Stormberry AS](https://stormberry.as). Proudly powered by sovereign AI agents.
 
-Data generation powered by [Deep-Translator](https://github.com/nidhaloff/deep-translator) (MIT License).
+Data generation powered by [Deep-Translator](https://github.com/nidhaloff/deep-translator) (Apache License 2.0; see [NOTICE](NOTICE)).
+
+The generator's own pages and the Android footer credit only that project, the source of the word lists. Everything else the Android app ships or is built with is credited here and in [NOTICE](NOTICE), with the licence of each:
+
+- [Inter](https://rsms.me/inter/), the typeface (SIL Open Font License 1.1).
+- [Lucide](https://lucide.dev/), the LinkedIn and GitHub icons in the Android footer (ISC, with portions under MIT from Feather).
+- [Material Icons](https://github.com/google/material-design-icons), the copy and refresh icons (Apache License 2.0).
+- [Android Jetpack](https://developer.android.com/jetpack) (AndroidX, Compose, Material 3) and the [Kotlin](https://kotlinlang.org/) libraries, which the Android app is written with (Apache License 2.0).
+- The Nostr and Tor marks have no recorded author; NOTICE says so.
 
 ## Disclaimer
 

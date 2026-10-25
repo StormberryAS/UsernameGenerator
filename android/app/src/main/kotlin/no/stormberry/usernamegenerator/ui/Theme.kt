@@ -27,6 +27,27 @@ object Stormberry {
     val TextMain = Color(0xFFFFFFFF)
     val TextMuted = Color(0xFF8A8A93)
 
+    /**
+     * The footer's colours. [TextMuted] is 5.8:1 on [Background], enough for a hint but dim for
+     * a sentence that credits the word-list source, so the credit and the bold privacy line
+     * use [TextSoft] (10.1:1) and the small print uses [TextSmallPrint] (7.1:1). Every footer
+     * text colour is at least 4.5:1 on [Background]; the measured figures are in BUILD-3.md.
+     */
+    val TextSoft = Color(0xFFB8B8C2)
+    val TextSmallPrint = Color(0xFF9A9AA4)
+
+    /** The footer's top hairline and the divider inside it: white at 7% and 5%, as the web's. */
+    val BorderFooter = Color(0x12FFFFFF)
+    val BorderSoft = Color(0x0DFFFFFF)
+
+    /**
+     * The dot of the "Stormberry." wordmark. The web page paints it with a gradient from #E21E26
+     * to #FF4D54 (footer.css, .footer-dot); on a glyph this small the gradient reads as the colour
+     * between them, so the app uses that one colour and matches the page (where app and page
+     * differ, the page wins). Decoration only; the word is the text beside it.
+     */
+    val BrandDot = Color(0xFFF03A40)
+
     val AccentIndigo = Color(0xFF4F46E5)
     val AccentRose = Color(0xFFE11D48)
     val AccentSky = Color(0xFF0EA5E9)

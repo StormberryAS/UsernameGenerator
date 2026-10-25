@@ -10,7 +10,7 @@ aapt dump permissions UsernameGenerator-v1.0.1.apk
 
 The only line you should see is the package name. If anything else appears, do not install it.
 
-The footer links to stormberry.as. That is a hand-off, not a network call: the app fires an `ACTION_VIEW` intent and whichever browser you already have decides what to do with it. Nothing is fetched in this process, and `INTERNET` is still stripped from the merged manifest.
+Every footer link, including the credits, the social icons and the Disclaimer, is a hand-off, not a network call: the app fires an `ACTION_VIEW` intent and whichever app you already have decides what to do with it. Nothing is fetched in this process, and `INTERNET` is still stripped from the merged manifest. Privacy opens the policy inside the app.
 
 ## Install
 

@@ -8,21 +8,22 @@ blocks F-Droid inclusion.
 
 -------------------
 
-Deep-Translator
-  License:   MIT
+The app's footer and the website's credit only the first entry below, the source of the
+word lists. Everything else is credited here and in the README.
+
+Deep-Translator (a build tool for the word lists in data/; not shipped in the app)
+  License:   Apache License 2.0
   Author:    Nidhal Baccouri
   Source:    https://github.com/nidhaloff/deep-translator
-  Copyright (c) 2020 Nidhal Baccouri
+  Copyright June 2020 Nidhal Baccouri.
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to deal
-  in the Software without restriction, including without limitation the rights
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in all
-  copies or substantial portions of the Software.
+  The word lists were built with Deep-Translator 1.11.4. Its LICENSE file (on its default
+  branch, master, and inside the 1.11.4 wheel) is the Apache License, Version 2.0; the
+  package's PyPI metadata says "MIT", which is wrong, and earlier versions of this file
+  repeated it. Licensed under the Apache License, Version 2.0; you may not use these files
+  except in compliance with it.
+  Full licence: https://github.com/nidhaloff/deep-translator/blob/master/LICENSE
+  and https://www.apache.org/licenses/LICENSE-2.0
 
 Inter (fonts/inter/, and android/app/src/main/res/font/ in the Android app)
   License:   SIL Open Font License 1.1 (OFL-1.1)
@@ -31,8 +32,57 @@ Inter (fonts/inter/, and android/app/src/main/res/font/ in the Android app)
   Copyright (c) 2016 The Inter Project Authors
 
   This Font Software is licensed under the SIL Open Font License, Version 1.1.
-  Full license text: https://scripts.sil.org/OFL
+  Full licence text: https://scripts.sil.org/OFL
 
   The Android app bundles four static instances of fonts/inter/InterVariable.woff2
   (Regular, Medium, SemiBold and Bold), cut by android/tools/build-inter-fonts.py.
   Each keeps the original's copyright and licence records (name IDs 0, 13, 14).
+
+Lucide icons (the LinkedIn and GitHub marks in android/app/src/main/res/drawable/)
+  License:   ISC, with portions under the MIT License
+  Author:    Lucide Contributors; portions by Cole Bemis (Feather)
+  Source:    https://lucide.dev/
+  Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022 as part
+  of Feather (MIT). All other copyright (c) for Lucide are held by Lucide
+  Contributors 2022.
+
+  Permission to use, copy, modify, and/or distribute this software for any
+  purpose with or without fee is hereby granted, provided that the above
+  copyright notice and this permission notice appear in all copies.
+  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+  REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+  AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+  INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+  LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+  PERFORMANCE OF THIS SOFTWARE.
+  Full licence: https://lucide.dev/license
+
+Android Jetpack (AndroidX, Compose, Material 3) and the Kotlin libraries (the Android app)
+  License:   Apache License 2.0
+  Author:    Google LLC (AndroidX); JetBrains s.r.o. and Kotlin contributors (Kotlin,
+             kotlinx.coroutines)
+  Source:    https://developer.android.com/jetpack and https://kotlinlang.org/
+  The release APK contains compiled classes from these libraries, shrunk by R8
+  (packages androidx, kotlin and kotlinx only). Each is licensed under the Apache
+  License, Version 2.0; you may not use these files except in compliance with it.
+  Full licence: https://www.apache.org/licenses/LICENSE-2.0
+
+Material Icons (the copy and refresh icons in android/app/src/main/res/drawable/)
+  License:   Apache License 2.0
+  Author:    Google LLC
+  Source:    https://github.com/google/material-design-icons
+  ic_copy.xml is the "content_copy" icon and ic_refresh.xml the "refresh" icon, both path
+  data unchanged. Licensed under the Apache License, Version 2.0; you may not use these
+  files except in compliance with it.
+  Full licence: https://www.apache.org/licenses/LICENSE-2.0
+
+Nostr and Tor marks (ic_social_nostr.xml and ic_social_onion.xml in the Android app)
+  License:   none claimed
+  The footer's icon row points to Stormberry's own Nostr identity and onion address, with
+  the same marks as the footer of CheckLink and the other Stormberry apps. The author and
+  the licence of both drawings are not recorded in any Stormberry repo, so they cannot be
+  credited here; nothing is claimed for them. "Nostr" and "Tor" and their marks belong to
+  their owners; they are shown only to say where to find Stormberry on those networks and
+  imply no endorsement. If you made either drawing, or know who did, please
+  tell info@stormberry.as so that it can be credited or the drawing replaced.
