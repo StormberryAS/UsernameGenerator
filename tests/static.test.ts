@@ -107,8 +107,12 @@ test('the TypeScript set-up follows MoonApp: TypeScript 6.0.3 pinned, strict, a 
   assert.deepEqual(tests.compilerOptions.lib, ['ES2023', 'DOM', 'DOM.Iterable'], 'the DOM library types the in-page functions');
   assert.match(read('tools/build-ts.sh'), /tests\/tsconfig\.json/);
   assert.deepEqual(readdirSync(new URL('./', import.meta.url)).filter((n) => /\.(m?js|cjs)$/.test(n)), [], 'no JavaScript left in tests/');
-  // The temporary CommonJS marker for the two hand-written generators (decision D-2); part 2 deletes it.
-  assert.deepEqual(JSON.parse(read('tools/package.json')), { type: 'commonjs' });
+  // The golden generators are TypeScript too, type-checked with the tests, and nothing under tools/
+  // marks the folder CommonJS any more (the temporary tools/package.json of decision D-2 is gone).
+  assert.ok(tests.include.includes('../tools/*.ts'), 'tests/tsconfig.json type-checks tools/*.ts');
+  const tools = readdirSync(new URL('../tools/', import.meta.url));
+  for (const f of ['gen-sanitise-golden.ts', 'gen-strength-golden.ts']) assert.ok(tools.includes(f), `tools/${f} exists`);
+  assert.deepEqual(tools.filter((n) => /\.(m?js|cjs)$/.test(n) || n === 'package.json'), [], 'no JavaScript and no package.json under tools/');
 });
 
 test('script.js uses the platform CSPRNG, no storage, and reaches only its own data files', () => {
@@ -122,10 +126,11 @@ test('script.js uses the platform CSPRNG, no storage, and reaches only its own d
 
 // S-1 (24 October 2026, as MoonApp's of 22 October): the only JavaScript in the repository is
 // compiled output. Every .js, .mjs and .cjs that git tracks, or would pick up (untracked and not
-// ignored), is script.js, plus the two golden generators that are still hand-written JavaScript
-// and are removed in part 2 of the move. script.js is marked linguist-generated, so GitHub's
-// language bar counts none of it. A hand-written script anywhere else fails here.
-test('the only JavaScript is compiled, apart from the two generators removed in part 2, and marked so (S-1)', (t) => {
+// ignored), is script.js, the compiled page. (Until part 2 of the move the two golden generators
+// under tools/ were hand-written JavaScript and were named here; they are TypeScript now.)
+// script.js is marked linguist-generated, so GitHub's language bar counts none of it. A
+// hand-written script anywhere else fails here.
+test('the only JavaScript is the compiled script.js, and it is marked so (S-1)', (t) => {
   const root = new URL('../', import.meta.url);
   const git = (...args: string[]): string => execFileSync('git', ['-C', root.pathname, ...args], { encoding: 'utf8' });
   let inGit = false;
@@ -134,10 +139,9 @@ test('the only JavaScript is compiled, apart from the two generators removed in 
   const walk = (dir: string): string[] => readdirSync(new URL(dir, root)).flatMap((n) => (n.endsWith('.ts') ? [`${dir}${n}`] : /\./.test(n) ? [] : walk(`${dir}${n}/`)));
   const compiled = walk('ts/').filter((f) => !f.endsWith('.d.ts')).map((f) => f.replace(/^ts\//, '').replace(/\.ts$/, '.js')).sort();
   assert.deepEqual(compiled, ['script.js'], 'ts/ compiles to script.js');
-  const removedInPart2 = ['tools/gen-sanitise-golden.js', 'tools/gen-strength-golden.js'];
-  const allowed = [...compiled, ...removedInPart2].sort();
+  const allowed = [...compiled].sort();
   const js = git('ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', '*.js', '*.mjs', '*.cjs').split('\0').filter(Boolean);
-  assert.deepEqual([...new Set(js)].sort(), allowed, 'JavaScript in the repository other than the compiled file and the two generators');
+  assert.deepEqual([...new Set(js)].sort(), allowed, 'JavaScript in the repository other than the compiled file');
   const attr = (name: string, files: string[]): Map<string, string> => {
     const out = git('check-attr', '-z', name, '--', ...files).split('\0');
     const m = new Map<string, string>();

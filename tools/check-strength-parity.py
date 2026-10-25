@@ -31,7 +31,7 @@ failures = []
 # whatever the file says. Snapshot, regenerate, compare: correct whether the file
 # is committed, staged or brand new.
 before = open(CORPUS, encoding="utf-8").read() if os.path.exists(CORPUS) else None
-subprocess.run(["node", "tools/gen-strength-golden.js"],
+subprocess.run(["node", "tools/gen-strength-golden.ts"],
                cwd=ROOT, check=True, capture_output=True)
 after = open(CORPUS, encoding="utf-8").read()
 if before is None:

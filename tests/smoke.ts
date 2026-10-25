@@ -103,8 +103,8 @@ await check('the compiled script.js is what is served, under its current stamp',
 });
 
 await check('sources, tooling and tests are not served; the site is', async () => {
-  const hidden = ['ts/script.ts', 'tests/smoke.ts', 'tests/page-vectors.json', 'tests/serve.py', 'tests/tsconfig.json', 'tools/build-ts.sh', 'tools/package.json',
-    'tools/gen-sanitise-golden.js', 'tools/gen-strength-golden.js', 'tools/check-strength-parity.py', 'tools/gen-entropy-model.py',
+  const hidden = ['ts/script.ts', 'tests/smoke.ts', 'tests/page-vectors.json', 'tests/serve.py', 'tests/tsconfig.json', 'tools/build-ts.sh',
+    'tools/gen-sanitise-golden.ts', 'tools/gen-strength-golden.ts', 'tools/check-strength-parity.py', 'tools/gen-entropy-model.py',
     'package.json', 'package-lock.json', 'tsconfig.json', '.npmrc', '.gitattributes', 'node_modules/typescript/package.json', 'bump_assets.py', 'README.md', 'CHANGELOG.md',
     'username.py', 'build_dicts.py', 'build_dicts_robust.py', 'android/gradlew', 'android/app/build.gradle.kts', 'fastlane/metadata/android/en-US/full_description.txt',
     'zapstore.yaml', 'DISCLAIMER.md', 'PRIVACY.md', 'LICENSE', 'NOTICE', 'jsconfig.json', 'types/script.d.ts',

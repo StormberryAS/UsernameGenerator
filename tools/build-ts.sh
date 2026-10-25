@@ -18,8 +18,10 @@
 #                               when the root holds a .js that no ts/ source compiles to (a stray
 #                               left behind by a renamed or deleted source, which the site would
 #                               still publish); when a page carries a stale ?v=; or when the two
-#                               golden corpora the Android tests read, or the entropy model, are not
-#                               what their generators write (tools/check-strength-parity.py)
+#                               golden corpora the Android tests read are not what their generators
+#                               write (tools/gen-sanitise-golden.ts and tools/gen-strength-golden.ts,
+#                               each run with --check, which writes nothing), or the entropy model or
+#                               the strength readout is out of step (tools/check-strength-parity.py)
 #
 # Every mode also type-checks the tests (tests/*.ts, run by Node 24 directly) with
 # tests/tsconfig.json, strict; it writes nothing, and one that does not type-check fails the build
@@ -28,9 +30,9 @@
 # The compiled .js file is committed on purpose: GitHub Pages publishes the repository's files as
 # they are, with no build step of its own. Edit ts/*.ts, never the .js.
 #
-# Until part 2 of the move, tools/gen-sanitise-golden.js and tools/gen-strength-golden.js are still
-# hand-written JavaScript (they become TypeScript there). They sit under tools/, not at the root,
-# and tools/package.json marks that folder CommonJS so Node still runs them; both go in part 2.
+# The two golden generators under tools/ are TypeScript, run by Node 24 directly (since part 2 of the
+# move); they load the compiled script.js through tests/load.ts, so a build compiles first and
+# --check then runs them. There is no hand-written JavaScript left anywhere in the repository.
 #
 # Stamps. script.js imports nothing and carries no ?v= stamp. normalise() strips a stamp from a
 # relative URL inside compiled output (a ./x.js?v=0123abcd or ./x.css?v=0123abcd literal), as in
@@ -88,10 +90,6 @@ mapfile -t EXPECTED < <(cd ts && find . -type f -name '*.ts' ! -name '*.d.ts' -p
 [ "${OUTPUTS[*]}" = "${EXPECTED[*]}" ] \
   || die "tsc emitted [${OUTPUTS[*]}] but ts/ holds sources for [${EXPECTED[*]}]; look at tsconfig.json"
 
-# The hand-written JavaScript that is still allowed until part 2 of the move: the two golden
-# generators under tools/. Nothing else may sit beside the compiled file, at the root or in tools/.
-HAND_WRITTEN=(tools/gen-sanitise-golden.js tools/gen-strength-golden.js)
-
 tracked() { [ "$GIT" = 1 ] && git ls-files --error-unmatch -- "$1" >/dev/null 2>&1; }
 
 if [ "$MODE" = check ]; then
@@ -108,15 +106,20 @@ if [ "$MODE" = check ]; then
       echo "build-ts: $f matches ts/"
     fi
   done
-  # JavaScript with no source: only the compiled files, and the two tools named above.
+  # JavaScript with no source: only the compiled files are allowed.
   mapfile -t PRESENT < <(find . -path ./node_modules -prune -o -path ./android -prune -o -path ./.git -prune -o -type f \( -name '*.js' -o -name '*.mjs' -o -name '*.cjs' \) -printf '%P\n' | LC_ALL=C sort)
   for f in "${PRESENT[@]}"; do
-    case " ${OUTPUTS[*]} ${HAND_WRITTEN[*]} " in
+    case " ${OUTPUTS[*]} " in
       *" $f "*) ;;
       *) echo "build-ts: $f is JavaScript that no ts/ source compiles to: delete it (git rm), or restore its source" >&2; bad=1 ;;
     esac
   done
   python3 -I "$ROOT/bump_assets.py" --check || bad=1
+  # The generators read the compiled script.js at the root, which the loop above has just shown to
+  # be what ts/ compiles to (a failure there is already counted in bad).
+  for gen in gen-sanitise-golden gen-strength-golden; do
+    node "$ROOT/tools/$gen.ts" --check || bad=1
+  done
   python3 -I "$ROOT/tools/check-strength-parity.py" || bad=1
   [ "$bad" = 0 ] || exit 1
   echo "build-ts: check passed"

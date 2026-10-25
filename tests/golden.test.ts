@@ -1,17 +1,18 @@
 // The parity contracts with the Android port and the command line: the two golden corpora the
 // Kotlin tests read are what the generators write from the compiled script.js, and
 // tools/check-strength-parity.py still finds the three implementations of the strength readout in
-// agreement. Added on 24 October 2026 with the TypeScript move.
+// agreement. Added on 24 October 2026 with the TypeScript move; part 2 of the move made the two
+// generators TypeScript (tools/gen-*.ts, which load the compiled page through tests/load.ts) and
+// gave each a --check mode, which this file runs.
 //
-// The generators and the parity script write into the repository they sit in, so each is run on a
-// throwaway copy of exactly the files it reads, and the copy is compared with what is committed.
-// Nothing here writes to the working tree. The two generators are still JavaScript until part 2 of
-// the move.
+// The generators and the parity script write into the repository they sit in, so the writing runs
+// happen on a throwaway copy of exactly the files they read, and the copy is compared with what is
+// committed. The --check runs write nothing and run on the repository itself.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -23,27 +24,61 @@ const ENGINE = 'android/app/src/main/kotlin/no/stormberry/usernamegenerator/User
 /** A copy of what the generators and the parity script read, in a folder of its own. */
 function copyOfRepository(): string {
   const dir = mkdtempSync(join(tmpdir(), 'ug-golden-'));
-  for (const f of ['script.js', 'username.py', 'data', 'tools', STRENGTH, SANITISE, ENGINE]) {
+  for (const f of ['script.js', 'package.json', 'username.py', 'data', 'tools', 'tests/load.ts', STRENGTH, SANITISE, ENGINE]) {
     mkdirSync(join(dir, f, '..'), { recursive: true });
     cpSync(join(root, f), join(dir, f), { recursive: true });
   }
   return dir;
 }
 
+test('--check: both committed corpora are what the generators write, and nothing is written', () => {
+  const before = [STRENGTH, SANITISE].map((f) => readFileSync(join(root, f)));
+  const sanitise = execFileSync(process.execPath, [join(root, 'tools/gen-sanitise-golden.ts'), '--check'], { encoding: 'utf8' });
+  assert.match(sanitise, /^sanitise golden check OK: .*sanitise-golden\.csv matches, 59 rows\n$/);
+  const strength = execFileSync(process.execPath, [join(root, 'tools/gen-strength-golden.ts'), '--check'], { encoding: 'utf8' });
+  assert.match(strength, /^strength golden check OK: .*strength-golden\.tsv matches, 4684 rows\n$/);
+  [STRENGTH, SANITISE].forEach((f, i) => assert.ok(readFileSync(join(root, f)).equals(before[i] as Buffer), `${f} was not touched`));
+});
+
+test('--check fails, with exit status 1 and a message, on a corpus that was edited', () => {
+  const dir = copyOfRepository();
+  try {
+    for (const [gen, f, edit] of [
+      ['gen-sanitise-golden.ts', SANITISE, (t: string): string => t.replace('simplecase,simplecase', 'simplecase,SIMPLECASE')],
+      ['gen-strength-golden.ts', STRENGTH, (t: string): string => t.replace(/\n/, '\n#\n')],
+    ] as const) {
+      const path = join(dir, f);
+      const text = readFileSync(path, 'utf8');
+      const edited = edit(text);
+      assert.notEqual(edited, text, `${f}: the edit changed something`);
+      writeFileSync(path, edited);
+      assert.throws(
+        () => execFileSync(process.execPath, [join(dir, 'tools', gen), '--check'], { encoding: 'utf8', stdio: 'pipe' }),
+        (e: { status?: number; stderr?: string }) => e.status === 1 && /is NOT what tools\/gen-(sanitise|strength)-golden\.ts writes/.test(e.stderr ?? ''),
+        `${gen} --check rejects an edited ${f}`,
+      );
+      assert.equal(readFileSync(path, 'utf8'), edited, '--check did not repair the file');
+    }
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('the two golden corpora are byte for byte what the generators write from script.js', () => {
   const dir = copyOfRepository();
   try {
     // Start from something else, so a generator that wrote nothing could not pass.
     for (const f of [STRENGTH, SANITISE]) rmSync(join(dir, f));
-    const sanitise = execFileSync(process.execPath, [join(dir, 'tools/gen-sanitise-golden.js')], { encoding: 'utf8' });
+    const sanitise = execFileSync(process.execPath, [join(dir, 'tools/gen-sanitise-golden.ts')], { encoding: 'utf8' });
     assert.match(sanitise, /59 rows, 38 distinct non-ASCII characters/);
     assert.match(sanitise, /rows whose OUTPUT is still non-ASCII: 0/);
-    const strength = execFileSync(process.execPath, [join(dir, 'tools/gen-strength-golden.js')], { encoding: 'utf8' });
+    const strength = execFileSync(process.execPath, [join(dir, 'tools/gen-strength-golden.ts')], { encoding: 'utf8' });
     assert.match(strength, /^4684 rows -> /);
     assert.match(strength, /max entropy: mix \+ verb \+ 5 words \+ 5 digits \+ mix separators = 148\.5 bits/);
     for (const f of [STRENGTH, SANITISE]) {
       assert.ok(readFileSync(join(dir, f)).equals(readFileSync(join(root, f))), `${f} is what its generator writes`);
     }
+    assert.equal(readFileSync(join(root, STRENGTH), 'utf8').split('\n')[0], '# generated by tools/gen-strength-golden.ts from script.js; do not edit');
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

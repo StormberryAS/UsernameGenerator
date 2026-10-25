@@ -147,8 +147,8 @@ would be a verdict this tool has no business issuing.
 
 `tools/gen-entropy-model.py` computes the exact entropy of all 13 options under
 no-repeat drawing, using inclusion-exclusion over set partitions because a word can
-sit in both the noun and the verb list. `tools/gen-strength-golden.js` lifts the
-display maths out of `script.js` and writes 3,124 expectations that
+sit in both the noun and the verb list. `tools/gen-strength-golden.ts` loads
+the compiled `script.js` and writes 4,684 expectations that
 `StrengthGoldenTest` asserts row by row. `tools/check-strength-parity.py`, run by CI
 before the build, catches what those cannot: a stale corpus, a stale entropy model,
 `username.py` drifting, and the three language orders falling out of step.
@@ -188,7 +188,7 @@ tools/build-ts.sh --check    # change nothing; fail if script.js, a stamp or a g
 npm test                     # the Node tests
 npm run smoke                # the page in headless Chromium, against the frozen vectors
 ```
-This needs Node 24, Python 3 and, for the smoke test, Chromium. `package.json`, `package-lock.json`, `tsconfig.json`, `.npmrc`, `ts/`, `tests/` and `node_modules/` are development files only: `_config.yml` keeps them off the site, and the Android build copies only the word lists and `entropy-model.tsv` from `data/`. The two generators in `tools/` lift code out of the compiled `script.js` by pattern, so keep type annotations on the line above a `const`, never between `=` and its value.
+This needs Node 24, Python 3 and, for the smoke test, Chromium. `package.json`, `package-lock.json`, `tsconfig.json`, `.npmrc`, `ts/`, `tests/` and `node_modules/` are development files only: `_config.yml` keeps them off the site, and the Android build copies only the word lists and `entropy-model.tsv` from `data/`. The two golden generators in `tools/` are TypeScript too (`node tools/gen-strength-golden.ts`, `node tools/gen-sanitise-golden.ts`; `--check` writes nothing and fails on any difference); they load the compiled `script.js` and call the page's own functions.
 
 ### Terminal Integration
 

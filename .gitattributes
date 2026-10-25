@@ -6,8 +6,8 @@
 # script.js is compiled from ts/script.ts by tools/build-ts.sh; edit the TypeScript.
 /script.js linguist-generated=true
 # The test corpora for the Android port and the command line, each written from the compiled
-# script.js by the tools/ generator of the same name (tools/gen-strength-golden and
-# tools/gen-sanitise-golden); tools/check-strength-parity.py holds them to it.
+# script.js by the tools/ generator of the same name (tools/gen-strength-golden.ts and
+# tools/gen-sanitise-golden.ts); tools/check-strength-parity.py holds them to it.
 /android/app/src/test/resources/strength-golden.tsv linguist-generated=true
 /android/app/src/test/resources/sanitise-golden.csv linguist-generated=true
 # The exact entropy of every language mode, written from the word lists by tools/gen-entropy-model.py.
