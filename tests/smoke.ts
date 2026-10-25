@@ -6,7 +6,8 @@
 //
 // Checks: every scenario of tests/scenarios.ts gives, step for step, the snapshot frozen in
 // tests/page-vectors.json, which was captured from the UsernameGenerator 12ddca5 page (the last
-// hand-written script.js), so the page behaves as 12ddca5 did; no request leaves the origin and no
+// hand-written script.js, with the licence label added to the footer credit, the one change to the
+// page text; every snapshot carries the page's hash), so the page behaves as 12ddca5 did; no request leaves the origin and no
 // console error or policy violation appears under the zone's header (except in the three scenarios
 // that take the word lists or the entropy model away on purpose); the compiled script.js is what is
 // served, under its current stamp; the sources and tooling are not served; no sideways scroll at
@@ -69,7 +70,7 @@ function quiet(p: Page, where: string): void {
 /** The scenarios that take word lists or the entropy model away: the page reports that on the console, as it should. */
 const LOSES_DATA = /^(word lists unavailable|entropy model unavailable|nothing from data unavailable)/;
 
-await check('the page as 12ddca5 left it: every scenario step gives its frozen snapshot', async () => {
+await check('the page as 12ddca5 left it (plus the footer licence label): every scenario step gives its frozen snapshot', async () => {
   const frozen = JSON.parse(read('tests/page-vectors.json')) as { capturedFrom: string; vectors: Vector[] };
   assert.match(frozen.capturedFrom, /^UsernameGenerator 12ddca5 /);
   const now = await runScenarios(browser, base, {
@@ -103,14 +104,14 @@ await check('the compiled script.js is what is served, under its current stamp',
 });
 
 await check('sources, tooling and tests are not served; the site is', async () => {
-  const hidden = ['ts/script.ts', 'tests/smoke.ts', 'tests/page-vectors.json', 'tests/serve.py', 'tests/tsconfig.json', 'tools/build-ts.sh',
+  const hidden = ['ts/script.ts', 'ts/sw.ts', 'tsconfig.sw.json', 'tests/sw-smoke.ts', 'tests/sw.test.ts', 'tests/smoke.ts', 'tests/page-vectors.json', 'tests/serve.py', 'tests/tsconfig.json', 'tools/build-ts.sh',
     'tools/gen-sanitise-golden.ts', 'tools/gen-strength-golden.ts', 'tools/check-strength-parity.py', 'tools/gen-entropy-model.py',
     'package.json', 'package-lock.json', 'tsconfig.json', '.npmrc', '.gitattributes', 'node_modules/typescript/package.json', 'bump_assets.py', 'README.md', 'CHANGELOG.md',
     'username.py', 'build_dicts.py', 'build_dicts_robust.py', 'android/gradlew', 'android/app/build.gradle.kts', 'fastlane/metadata/android/en-US/full_description.txt',
     'zapstore.yaml', 'DISCLAIMER.md', 'PRIVACY.md', 'LICENSE', 'NOTICE', 'jsconfig.json', 'types/script.d.ts',
     'android/app/src/test/resources/strength-golden.tsv', 'android/app/src/test/resources/sanitise-golden.csv'];
   for (const path of hidden) assert.equal((await fetch(`${base}${path}`)).status, 404, `${path} is not served`);
-  for (const path of ['', 'index.html', 'script.js', 'style.css', 'footer.css', 'disclaimer.html', 'privacy.html', 'favicon.svg', 'fonts/inter/inter.css', 'apple-touch-icon.png',
+  for (const path of ['', 'index.html', 'script.js', 'sw.js', 'style.css', 'footer.css', 'disclaimer.html', 'privacy.html', 'favicon.svg', 'fonts/inter/inter.css', 'apple-touch-icon.png',
     'data/en_nouns.txt', 'data/pt_verbs.txt', 'data/entropy-model.tsv', 'og-image.png', 'robots.txt']) {
     assert.equal((await fetch(`${base}${path}`)).status, 200, `${path || '/'} is served`);
   }

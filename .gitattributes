@@ -5,6 +5,8 @@
 #
 # script.js is compiled from ts/script.ts by tools/build-ts.sh; edit the TypeScript.
 /script.js linguist-generated=true
+# sw.js, the offline pilot's service worker, is compiled from ts/sw.ts the same way.
+/sw.js linguist-generated=true
 # The test corpora for the Android port and the command line, each written from the compiled
 # script.js by the tools/ generator of the same name (tools/gen-strength-golden.ts and
 # tools/gen-sanitise-golden.ts); tools/check-strength-parity.py holds them to it.

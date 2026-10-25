@@ -8,7 +8,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { defined } from './helpers.ts';
 
 const read = (p: string): string => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
@@ -54,11 +54,11 @@ test('every local script and stylesheet carries the ?v= stamp of its current byt
 test('_config.yml keeps sources, tooling and tests off the site, and publishes the app', () => {
   const cfg = read('_config.yml');
   const excluded = [...cfg.matchAll(/^ {2}- (\S+)$/gm)].map((m) => m[1]);
-  for (const x of ['ts/', 'tools/', 'tests/', 'node_modules/', 'package.json', 'package-lock.json', 'tsconfig.json', '.npmrc', 'bump_assets.py', 'README.md', 'DISCLAIMER.md', 'PRIVACY.md', 'LICENSE', 'NOTICE', 'android/', 'fastlane/', 'zapstore.yaml', 'username.py', 'build_dicts.py', 'build_dicts_robust.py']) {
+  for (const x of ['ts/', 'tools/', 'tests/', 'node_modules/', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.sw.json', '.npmrc', 'bump_assets.py', 'README.md', 'DISCLAIMER.md', 'PRIVACY.md', 'LICENSE', 'NOTICE', 'android/', 'fastlane/', 'zapstore.yaml', 'username.py', 'build_dicts.py', 'build_dicts_robust.py']) {
     assert.ok(excluded.includes(x), `${x} is excluded`);
   }
   // The page fetches data/ at run time, and loads script.js, so neither may ever be excluded.
-  for (const x of ['script.js', 'data/', 'index.html', 'style.css', 'footer.css', 'disclaimer.html', 'privacy.html', 'fonts/', 'switcher-icons/']) assert.ok(!excluded.includes(x), `${x} is published`);
+  for (const x of ['script.js', 'sw.js', 'data/', 'index.html', 'style.css', 'footer.css', 'disclaimer.html', 'privacy.html', 'fonts/', 'switcher-icons/']) assert.ok(!excluded.includes(x), `${x} is published`);
   // Gone with the move: nothing may still point at them.
   for (const x of ['jsconfig.json', 'types/']) assert.ok(!excluded.includes(x), `${x} no longer exists`);
 });
@@ -90,7 +90,7 @@ test('the TypeScript set-up follows MoonApp: TypeScript 6.0.3 pinned, strict, a 
   assert.equal(ts.compilerOptions.module, 'ES2020');
   assert.equal(ts.compilerOptions.target, 'ES2020');
   assert.deepEqual(ts.include, ['ts/**/*.ts']);
-  assert.deepEqual(ts.exclude, [], 'an explicit exclude: with outDir set to ".", tsc would otherwise exclude everything');
+  assert.deepEqual(ts.exclude, ['ts/sw.ts'], 'an explicit exclude: with outDir set to ".", tsc would otherwise exclude everything; the worker is a second program (tsconfig.sw.json)');
   assert.match(read('.gitignore'), /^node_modules\/$/m);
   // script.ts is a classic script: no import or export, so tsc emits a script and index.html keeps
   // loading script.js without type="module" (decision D-1).
@@ -126,11 +126,12 @@ test('script.js uses the platform CSPRNG, no storage, and reaches only its own d
 
 // S-1 (24 October 2026, as MoonApp's of 22 October): the only JavaScript in the repository is
 // compiled output. Every .js, .mjs and .cjs that git tracks, or would pick up (untracked and not
-// ignored), is script.js, the compiled page. (Until part 2 of the move the two golden generators
-// under tools/ were hand-written JavaScript and were named here; they are TypeScript now.)
-// script.js is marked linguist-generated, so GitHub's language bar counts none of it. A
-// hand-written script anywhere else fails here.
-test('the only JavaScript is the compiled script.js, and it is marked so (S-1)', (t) => {
+// ignored), is script.js, the compiled page, or sw.js, the compiled service worker of the offline
+// pilot. (Until part 2 of the move the two golden generators under tools/ were hand-written
+// JavaScript and were named here; they are TypeScript now.) Both files are marked
+// linguist-generated, so GitHub's language bar counts none of it. A hand-written script anywhere
+// else fails here.
+test('the only JavaScript is the compiled script.js and sw.js, and they are marked so (S-1)', (t) => {
   const root = new URL('../', import.meta.url);
   const git = (...args: string[]): string => execFileSync('git', ['-C', root.pathname, ...args], { encoding: 'utf8' });
   let inGit = false;
@@ -138,7 +139,7 @@ test('the only JavaScript is the compiled script.js, and it is marked so (S-1)',
   if (!inGit) { t.skip('not a git checkout'); return; }
   const walk = (dir: string): string[] => readdirSync(new URL(dir, root)).flatMap((n) => (n.endsWith('.ts') ? [`${dir}${n}`] : /\./.test(n) ? [] : walk(`${dir}${n}/`)));
   const compiled = walk('ts/').filter((f) => !f.endsWith('.d.ts')).map((f) => f.replace(/^ts\//, '').replace(/\.ts$/, '.js')).sort();
-  assert.deepEqual(compiled, ['script.js'], 'ts/ compiles to script.js');
+  assert.deepEqual(compiled, ['script.js', 'sw.js'], 'ts/ compiles to script.js and sw.js');
   const allowed = [...compiled].sort();
   const js = git('ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', '*.js', '*.mjs', '*.cjs').split('\0').filter(Boolean);
   assert.deepEqual([...new Set(js)].sort(), allowed, 'JavaScript in the repository other than the compiled file');
@@ -181,4 +182,131 @@ test('no page code is written inside a string: the browser is driven by typed fu
     lines.forEach((line, i) => { if (!/^\s*(\/\/|\*)/.test(line) && quoted.test(line)) bad.push(`${f}:${i + 1}: ${line.trim().slice(0, 70)}`); quoted.lastIndex = 0; });
   }
   assert.deepEqual(bad, []);
+});
+
+// The offline pilot (ported 24 October 2026 from MoonApp cba61dd, itself from SunApp 88f59d4): ts/sw.ts, compiled to sw.js,
+// registered by offlinePilot() in ts/script.ts on https://username.stormberry.as only. tests/sw-smoke.ts runs it in Chromium.
+const listed = (src: string): string[] => {
+  const m = /const ASSETS(?:: readonly string\[\])? = \[([\s\S]*?)\];/.exec(src);
+  return [...defined(m?.[1], 'the ASSETS list').matchAll(/'([^']*)'/g)].map((x) => defined(x[1], 'an entry'));
+};
+const stampOfFile = (path: string): string => createHash('sha256').update(readFileSync(new URL(`../${path}`, import.meta.url))).digest('hex').slice(0, 8);
+const FONTS = ['./fonts/inter/InterVariable.woff2', './fonts/inter/InterVariable-Italic.woff2'];
+const PAGES = ['index.html', 'disclaimer.html', 'privacy.html'];
+
+test('offline pilot: sw.js stores exactly what the pages load, under the stamps the pages use', () => {
+  const assets = listed(read('sw.js'));
+  // ts/sw.ts holds the same list without stamps; bump_assets.py writes them into sw.js.
+  assert.deepEqual(listed(read('ts/sw.ts')), assets.map((a) => a.replace(/\?v=[0-9a-f]{8}$/, '')));
+  assert.equal(new Set(assets).size, assets.length, 'no entry twice');
+  // Every script and stylesheet the three pages load, with the stamp they load it under.
+  const pageRefs = new Set<string>();
+  for (const html of PAGES) {
+    for (const m of read(html).matchAll(/(?:src|href)="((?!https?:|\/\/|data:|#|mailto:)[^"?#]+\.(?:js|css)\?v=[0-9a-f]{8})"/g)) pageRefs.add(`./${m[1]}`);
+  }
+  assert.deepEqual(assets.filter((a) => /\?v=/.test(a)).sort(), [...pageRefs].sort());
+  for (const a of assets) {
+    const m = /^\.\/([^?]*)(?:\?v=([0-9a-f]{8}))?$/.exec(a);
+    assert.ok(m, `${a} is a relative path`);
+    const path = defined(m[1], 'path') || 'index.html';
+    assert.ok(existsSync(new URL(`../${path}`, import.meta.url)), `${a} exists`);
+    if (m[2]) assert.equal(m[2], stampOfFile(path), `${a} carries the hash of ${path}`);
+    if (/\.(js|css)$/.test(path)) assert.ok(m[2], `${a} is stamped`);
+  }
+  // The rest: the page itself, the two Inter faces the pages request, the favicon, the two other
+  // pages, every word list and the entropy model (script.js fetches them at run time: the mixed
+  // language setting needs all 33, and the strength readout needs the model) and every carousel icon.
+  const names = (dir: string, ext: string): string[] => readdirSync(new URL(`../${dir}/`, import.meta.url)).filter((n) => n.endsWith(ext)).sort().map((n) => `./${dir}/${n}`);
+  const words = names('data', '.txt');
+  assert.equal(words.length, 33, 'eleven languages, three word types');
+  assert.deepEqual(assets.filter((a) => !/\?v=/.test(a)), ['./', ...FONTS, './favicon.svg', './privacy.html', './disclaimer.html', ...words, './data/entropy-model.tsv', ...names('switcher-icons', '.svg')]);
+  // Measured on 24 October 2026 with the network log of all three pages in Chromium: the generator asks
+  // for InterVariable.woff2 only, the privacy page and the disclaimer for it and the italic.
+  for (const f of FONTS) assert.match(read('fonts/inter/inter.css'), new RegExp(`url\\("${f.split('/').pop()}"\\)`), `${f} is the one inter.css asks for`);
+  // The Home Screen icon (12ddca5) is linked by every page but deliberately not stored: iOS fetches
+  // it online when the page is added, and precaching is all or nothing, so a listed file that went
+  // missing would fail every install.
+  for (const html of PAGES) {
+    assert.match(read(html), /<link rel="apple-touch-icon" href="apple-touch-icon\.png" \/>/, `${html} links the Home Screen icon`);
+  }
+  assert.ok(!assets.some((a) => a.includes('apple-touch-icon')), 'the Home Screen icon is not precached');
+});
+
+// The worker's precache and keepPage() treat every ?v= reference in a stored page as a same-origin
+// script or stylesheet it must hold (fix round 2, verify 1 offline C-4): an absolute or other kind
+// of ?v= reference would make every install fail without a word, so it fails here instead.
+test('offline pilot: every ?v= reference in the stored pages is a relative .js or .css path', () => {
+  for (const html of PAGES) {
+    const refs = [...read(html).matchAll(/(?:src|href)="([^"]*\?v=[^"]*)"/g)].map((m) => defined(m[1], 'a reference'));
+    assert.ok(refs.length > 0, `${html} has stamped references`);
+    for (const r of refs) assert.match(r, /^(?![a-z][a-z0-9+.-]*:|\/)[^"?#]+\.(?:js|css)\?v=[0-9a-f]{8}$/, `${html}: ${r}`);
+  }
+});
+
+test('offline pilot: registered only on https://username.stormberry.as; no manifest, no theme colour', () => {
+  const app = read('ts/script.ts');
+  assert.match(app, /if \(location\.protocol !== 'https:' \|\| location\.hostname !== 'username\.stormberry\.as'\) return;/);
+  // A bare 'sw.js', never './sw.js': the worker's address has to stay the same for the browser to
+  // update it in place, and the './x.js' form is the one bump_assets.py stamps in sw.js.
+  assert.match(app, /sw\.register\('sw\.js', \{ scope: '\.\/', updateViaCache: 'none' \}\)/);
+  assert.match(app, /^const OFFLINE_PILOT = '(off|opt-in|on)' as 'off' \| 'opt-in' \| 'on';$/m);
+  assert.match(app, /^ {4}try \{ offlinePilot\(\); \} catch \{/m);
+  assert.match(read('ts/sw.ts'), /^const KILL = (true|false) as boolean;$/m);
+  for (const html of PAGES) {
+    const text = read(html);
+    assert.doesNotMatch(text, /rel="manifest"/, `${html} has no manifest (it would let Chrome on Android offer an install that competes with Zapstore)`);
+    assert.doesNotMatch(text, /name="theme-color"/, `${html} has no theme colour`);
+    assert.doesNotMatch(text, /sw\.js/, `${html} does not load the worker as a script`);
+  }
+  // The page itself keeps nothing (the first test above), but a visitor who opts in to the offline pilot
+  // gets a stored copy, so both privacy texts say "no local storage" only with that exception (DRAFT for Marcos).
+  for (const f of ['privacy.html', 'PRIVACY.md']) {
+    assert.match(read(f).replace(/\s+/g, ' '), /no local storage \(unless you choose the offline option/i, `${f} names the offline option as the exception to "no local storage"`);
+  }
+  // The website footer carries the Android footer's texts word for word (Marcos, 2026-10-24: "keep web
+  // versions and APKs consistent"); FooterWebParityTest checks the same against FooterContent.kt.
+  // Two lines are the exception (Marcos, 2026-10-25, option B): the permission line and the privacy
+  // line say what is true of a web page, and the app keeps its own wording for them.
+  // The footer credits the one project the word lists were built with, with a link to its source and to
+  // its licence (Apache 2.0, as the Android footer says). Icons, fonts and languages go in NOTICE and the README only.
+  const credit = /<div class="footer-powered">\s*<p>([\s\S]*?)<\/p>/.exec(page)?.[1] ?? '';
+  assert.equal(
+    credit.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, '\u00a0'),
+    'Runs entirely on your device: our own code and word lists built with Deep-Translator (Apache\u00a02.0) and reviewed by native speakers. Nothing is sent.',
+    'the credit sentence is the Android footer\'s, word for word',
+  );
+  assert.match(credit, /built with <a href="https:\/\/github\.com\/nidhaloff\/deep-translator"[^>]*>Deep-Translator<\/a> \(<a href="https:\/\/github\.com\/nidhaloff\/deep-translator\/blob\/master\/LICENSE"[^>]*>Apache&nbsp;2\.0<\/a>\) and reviewed by native speakers\./, 'the credit names Deep-Translator and its licence, each linked');
+  assert.doesNotMatch(credit, /Inter|Lucide|Kotlin|TypeScript|Material|Jetpack/, 'no icon, font or language credit in the footer');
+  for (const [cls, text] of [
+    ['footer-tagline', 'Smarter sales. Global culture. AI-driven strategy.'],
+    ['footer-privacy', 'Privacy First: We do not collect cookies or personal data.'],
+    ['footer-dated', 'Word lists dated 2026-08-22'],
+    ['footer-ai', 'Proudly powered by sovereign AI agents.'],
+    // The two web versions, approved as written.
+    ['footer-offline', 'Your usernames and settings never leave this browser.'],
+    ['footer-permissions', 'No cookies. No tracking. Every username is generated in your browser.'],
+  ]) {
+    assert.ok(page.includes(`<p class="${cls}">${text}</p>`), `the footer line .${cls} is the approved wording, word for word`);
+  }
+  // The shared lines equal the app's constants; the app's own two lines stay as they are.
+  const kt = read('android/app/src/main/kotlin/no/stormberry/usernamegenerator/ui/components/FooterContent.kt');
+  const ktConst = (name: string): string => new RegExp(`const val ${name} = "([^"]*)"`).exec(kt)?.[1] ?? '';
+  assert.equal(ktConst('TAGLINE'), 'Smarter sales. Global culture. AI-driven strategy.');
+  assert.equal(ktConst('PRIVACY_FIRST'), 'Privacy First: We do not collect cookies or personal data.');
+  assert.equal(ktConst('AI'), 'Proudly powered by sovereign AI agents.');
+  assert.equal(ktConst('OFFLINE'), 'Your usernames and settings never leave this device. Disconnect and try it.', 'the app keeps its own privacy line');
+  assert.equal(ktConst('PERMISSIONS'), 'No permissions. No network. No tracking.', 'the app keeps its own permission line');
+  for (const [cls, name] of [['footer-tagline', 'TAGLINE'], ['footer-privacy', 'PRIVACY_FIRST'], ['footer-ai', 'AI']] as const) {
+    assert.ok(page.includes(`<p class="${cls}">${ktConst(name)}</p>`), `.${cls} equals the app's ${name}, word for word`);
+  }
+  for (const f of ['index.html', 'privacy.html', 'disclaimer.html']) {
+    assert.ok(read(f).includes('>Org.nr.&nbsp;NO&nbsp;937&nbsp;751&nbsp;249</a>'), `${f}: the company line has the Android footer's unbreakable Org.nr.`);
+  }
+  // The worker is checked as a worker: no DOM, the WebWorker library, and kept out of the page program.
+  const swc = JSON.parse(read('tsconfig.sw.json'));
+  assert.equal(swc.extends, './tsconfig.json');
+  assert.deepEqual(swc.compilerOptions.lib, ['ES2020', 'WebWorker']);
+  assert.deepEqual(swc.include, ['ts/sw.ts']);
+  assert.deepEqual(JSON.parse(read('tsconfig.json')).exclude, ['ts/sw.ts']);
+  assert.match(read('tools/build-ts.sh'), /tsconfig\.sw\.json/);
 });

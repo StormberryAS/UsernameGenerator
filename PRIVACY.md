@@ -40,8 +40,9 @@ update check and no server to ask.
 
 ## The web version
 
-Static files. No cookies, no local storage, no analytics and no third-party scripts or
-frames. The generator, its fonts and its word lists are served from this site and nowhere
+Static files. No cookies, no local storage (unless you choose the offline option, which keeps a
+copy of this site on your device so that it opens without a network), no analytics and no
+third-party scripts or frames. The generator, its fonts and its word lists are served from this site and nowhere
 else, and everything you generate happens in your browser and stays there.
 
 GitHub Pages stores the site and keeps its own logs; Cloudflare delivers it on our behalf

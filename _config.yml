@@ -27,6 +27,9 @@ exclude:
   - tsconfig.json
   - ts/
   - tests/
+  # The offline pilot (ported 24 October 2026 from MoonApp cba61dd): ts/sw.ts compiles to sw.js,
+  # which IS published (the page registers it); its compiler settings are not.
+  - tsconfig.sw.json
 
 # data/ is deliberately NOT excluded: script.js fetches data/<lang>_<cat>.txt and
 # data/entropy-model.tsv from the live site at runtime, so excluding it would 404

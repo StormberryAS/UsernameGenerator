@@ -429,4 +429,26 @@ window.addEventListener('DOMContentLoaded', () => {
     syncDigitControls();
     updateStrength();
     generateUsername();
+    try {
+        offlinePilot();
+    }
+    catch { }
 });
+const OFFLINE_PILOT = 'opt-in';
+function offlinePilot() {
+    if (!('serviceWorker' in navigator))
+        return;
+    if (location.protocol !== 'https:' || location.hostname !== 'username.stormberry.as')
+        return;
+    const sw = navigator.serviceWorker;
+    if (OFFLINE_PILOT === 'off') {
+        void sw.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister())))
+            .then(() => caches.keys())
+            .then((ks) => Promise.all(ks.filter((k) => k.startsWith('usernamegenerator-')).map((k) => caches.delete(k))))
+            .catch(() => undefined);
+        return;
+    }
+    if (OFFLINE_PILOT === 'opt-in' && new URLSearchParams(location.search).get('offline') !== '1' && !sw.controller)
+        return;
+    void sw.register('sw.js', { scope: './', updateViaCache: 'none' }).catch(() => undefined);
+}
