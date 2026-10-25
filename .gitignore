@@ -25,7 +25,7 @@ android/keystore.properties
 # them would give the repo two versions of the same word lists, free to disagree.
 android/app/src/main/assets/data/
 
-# Type-checking tooling (npm ci --ignore-scripts); never committed
+# Build and test tooling (npm ci --ignore-scripts); never committed
 node_modules/
 
 # Editor and OS noise

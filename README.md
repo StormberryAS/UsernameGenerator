@@ -158,7 +158,7 @@ python3 tools/check-strength-parity.py
 ```
 
 ## Architecture
-- **Vanilla HTML/CSS/JS** for the web interface, no frameworks, no build step.
+- **Vanilla HTML and CSS with a TypeScript page script** for the web interface, no frameworks. The script is compiled ahead of time and committed, so the site has no build step of its own and no runtime dependencies.
 - **Native Android app** (`android/`), Kotlin and Jetpack Compose, sharing the same `data/` dictionaries at build time so web, CLI and app never drift apart. Declares **no Android permissions at all**: writing to the clipboard has never needed one, and there is no network access to request.
 - **Python CLI Engine** (`username.py`) serving as both the terminal utility and the core logic reference.
 - **Privacy first**, no cookies, no tracking. Fully local dictionary lookup.
@@ -178,13 +178,17 @@ python3 -m http.server 8000
 ```
 Open `http://localhost:8000` in your browser.
 
-### Type checking
-`script.js` stays plain JavaScript that the browser loads as written, with no build step. Its types live in JSDoc comments, and the TypeScript compiler (6.0.3, pinned) only checks them (`checkJs`, `noEmit`, `strict`).
+### TypeScript, build and tests
+The page script is written in TypeScript. `ts/script.ts` is the source, and `tools/build-ts.sh` compiles it to `script.js`. The compiled file is committed, because GitHub Pages publishes the repository as it is, with no build step of its own. Edit the TypeScript, never `script.js`. The compiler (TypeScript 6.0.3) and `@types/node` are pinned, and nothing from either reaches the site.
 
 ```bash
-npm ci --ignore-scripts && npm run typecheck
+npm ci --ignore-scripts      # install the pinned tooling
+tools/build-ts.sh            # compile ts/script.ts to script.js and refresh the ?v= stamps
+tools/build-ts.sh --check    # change nothing; fail if script.js, a stamp or a golden corpus is out of date
+npm test                     # the Node tests
+npm run smoke                # the page in headless Chromium, against the frozen vectors
 ```
-A clean run prints nothing and exits 0. `package.json`, `package-lock.json`, `jsconfig.json` and `node_modules/` are development files only: `_config.yml` keeps them off the site, and the Android build copies only the word lists and `entropy-model.tsv` from `data/`. The parity generators in `tools/` lift code out of `script.js` by pattern, so keep type annotations on the line above a `const`, never between `=` and its value.
+This needs Node 24, Python 3 and, for the smoke test, Chromium. `package.json`, `package-lock.json`, `tsconfig.json`, `.npmrc`, `ts/`, `tests/` and `node_modules/` are development files only: `_config.yml` keeps them off the site, and the Android build copies only the word lists and `entropy-model.tsv` from `data/`. The two generators in `tools/` lift code out of the compiled `script.js` by pattern, so keep type annotations on the line above a `const`, never between `=` and its value.
 
 ### Terminal Integration
 

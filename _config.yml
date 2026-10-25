@@ -15,14 +15,18 @@ exclude:
   - DISCLAIMER.md
   - bump_assets.py
   - PRIVACY.md
-  # Type-checking tooling, added 2026-10-16. Dev-only: the site is still plain JavaScript
-  # with no build step, so none of this may ever be served. types/ does not exist yet
-  # and is listed so a future declaration file cannot leak.
+  # Build and test tooling. Type-checking tooling was added on 2026-10-16; the TypeScript move
+  # (24 October 2026, on MoonApp's model) turned it into the TypeScript sources (ts/), the tests
+  # (tests/), the package files, .npmrc, tsconfig.json and the installed compiler (node_modules/,
+  # never committed). tools/ was excluded already. The page loads only the compiled script.js,
+  # which IS published. jsconfig.json and types/ are gone: the declarations moved into ts/.
   - node_modules/
   - package.json
   - package-lock.json
-  - jsconfig.json
-  - types/
+  - .npmrc
+  - tsconfig.json
+  - ts/
+  - tests/
 
 # data/ is deliberately NOT excluded: script.js fetches data/<lang>_<cat>.txt and
 # data/entropy-model.tsv from the live site at runtime, so excluding it would 404
