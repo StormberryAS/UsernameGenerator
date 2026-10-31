@@ -159,7 +159,7 @@ python3 tools/check-strength-parity.py
 
 ## Architecture
 - **Vanilla HTML and CSS with a TypeScript page script** for the web interface, no frameworks. The script is compiled ahead of time and committed, so the site has no build step of its own and no runtime dependencies.
-- **Native Android app** (`android/`), Kotlin and Jetpack Compose, sharing the same `data/` dictionaries at build time so web, CLI and app never drift apart. Declares **no Android permissions at all**: writing to the clipboard has never needed one, and there is no network access to request.
+- **Native Android app** (`android/`), Kotlin and Jetpack Compose, sharing the same `data/` dictionaries at build time so web, CLI and app never drift apart. Declares **no Android permissions at all**: writing to the clipboard has never needed one, and there is no network access to request. Like the website, it ends with the Stormberry Labs carousel above the footer: each card opens that app's website in your browser, which does the fetching.
 - **Python CLI Engine** (`username.py`) serving as both the terminal utility and the core logic reference.
 - **Privacy first**, no cookies, no tracking. Fully local dictionary lookup.
 - Stormberry dark-mode glassmorphism design system, Inter typography.

@@ -8,7 +8,7 @@ const KILL = false;
 const ASSETS = [
     './',
     './script.js?v=82b632f8',
-    './style.css?v=2411d2bb',
+    './style.css?v=d4a5a332',
     './footer.css?v=04169806',
     './fonts/inter/inter.css?v=868d674e',
     './fonts/inter/InterVariable.woff2',

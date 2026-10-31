@@ -81,4 +81,4 @@ application changes in the same release.
 The company policy covering the stormberry.as website and its contact form is a separate
 document at [stormberry.as/privacy.html](https://stormberry.as/privacy.html).
 
-*Last updated 2 October 2026.*
+*Last updated 25 October 2026.*

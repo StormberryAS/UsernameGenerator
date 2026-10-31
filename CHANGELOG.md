@@ -2,7 +2,28 @@
 
 Every released version of the UsernameGenerator Android app, newest first. Each release is tagged `android-vX.Y.Z` and its APK is on the [releases page](https://github.com/StormberryAS/UsernameGenerator/releases). The short note shown in the app store for a release is `fastlane/metadata/android/en-US/changelogs/<versionCode>.txt`; this file is the full log it points to. Website changes (username.stormberry.as) have no version number of their own; the ones that ship with a release are listed under it. The Google Play build of a tag has its own version number (see the table in `android/README.md`).
 
-## 1.1.4 (versionCode 7)
+## 1.1.5 (versionCode 8)
+
+The Stormberry Labs carousel from the website is now in the app too, between the generator and the footer. The generator, the word lists and the permissions are as in 1.1.4. The Google Play build of this tag is version 1.2.3 (code 8).
+
+Carousel
+- "Explore the Stormberry Ecosystem" shows the other Stormberry Labs apps in the order the website uses, with UsernameGenerator last. Screen readers say "This app" after its name.
+- The row slides slowly on its own. Tick "Pause the animation" to stop it. A finger on the row also holds it, and you can drag it by hand.
+- With Remove animations on, or with TalkBack on, the row stands still and the tick box is not shown.
+- Tap a card to open that app's website in your browser. The app still has no INTERNET permission: the browser loads the page in its own process. If no app on your device can open a link, a short message says so.
+
+Footer
+- The message for a footer link that no app can open now reads "No app on this device can open that link.", the same words as the carousel's.
+
+Tests and build
+- New tests keep the carousel's heading, tick box, cards, order and links equal to the website's, check that every card has its icon, and pin when the row moves and when it stands still.
+- The store screenshots are retaken for phone, 7-inch and 10-inch screens and show the carousel; the phone set gains a fourth shot for it. They are now 256-colour images under 250 KB, small enough for the Zapstore image server, so the repository and the Zapstore listing use the same files again.
+
+Website, shipped with this release
+- The carousel gains GDPRLetterBuilder, right after UsernameGenerator, and EclipseTracker moves to right after MoonApp.
+- The store buttons now read "Get the Android app on Zapstore" and "Get the Android app on Google Play". They are taller, easier to tap, and fit on a narrow screen.
+
+## 1.1.4 (versionCode 7), 2026-10-25
 
 A new top and bottom for the main screen, matching the other Stormberry apps. The generator, the word lists and the permissions are as in 1.1.3. The Google Play build of this tag is version 1.2.2 (code 7).
 

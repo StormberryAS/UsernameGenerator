@@ -1,0 +1,7 @@
+The Stormberry Labs carousel from the website is now in the app, above the footer.
+
+- It shows the other Stormberry Labs apps. Tap a card to open its website in your browser.
+- Tick "Pause the animation" to stop it. With Remove animations or TalkBack on, it stands still.
+- The app still declares no permissions.
+
+Full release log: https://github.com/StormberryAS/UsernameGenerator/blob/main/CHANGELOG.md

@@ -12,7 +12,8 @@ import androidx.core.net.toUri
  * Not [androidx.compose.ui.platform.LocalUriHandler]: that throws when nothing can open the
  * address, and the footer has two links a phone may well have no app for, a `nostr:` link
  * without a Nostr client and a `.onion` address without Tor Browser. Here that is a short
- * message, not a crash.
+ * message, not a crash. So is a handler the system refuses to start (a SecurityException),
+ * as in the carousel's openLabsLink.
  *
  * The app has no INTERNET permission and must never gain one (the manifest removes it, and
  * FooterLinksTest guards that line). It does not need one: the other app does the fetching.
@@ -23,8 +24,14 @@ fun openLink(context: Context, url: String): Boolean {
         context.startActivity(intent)
         true
     } catch (_: ActivityNotFoundException) {
-        Toast.makeText(context, "No app on this phone can open that link.", Toast.LENGTH_SHORT)
-            .show()
+        showNoAppToast(context)
+        false
+    } catch (_: SecurityException) {
+        showNoAppToast(context)
         false
     }
+}
+
+private fun showNoAppToast(context: Context) {
+    Toast.makeText(context, "No app on this device can open that link.", Toast.LENGTH_SHORT).show()
 }

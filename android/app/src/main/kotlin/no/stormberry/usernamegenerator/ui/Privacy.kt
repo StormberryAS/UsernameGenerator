@@ -28,25 +28,28 @@ import androidx.compose.ui.unit.dp
  * readable block is worth more than the indirection.
  */
 private const val PRIVACY_INTRO =
-    "UsernameGenerator collects nothing. There is no account, no analytics, no crash " +
-        "reporting, no advertising and no identifier of any kind. Nothing you generate, " +
-        "copy or set is sent anywhere, because the app cannot send anything: it declares " +
-        "no Android permissions at all, and INTERNET is stripped from the built package. " +
-        "Check it yourself with aapt dump permissions before you install."
+    "UsernameGenerator collects nothing. No account, no analytics, no crash reporting, " +
+        "no advertising, no cookies and no identifier of any kind. There is nothing to " +
+        "request, correct or erase, because there is nothing."
 
 private val PRIVACY_SECTIONS = listOf(
+    "The Android application" to
+        "It declares no Android permissions at all. Not \"only the clipboard\": genuinely " +
+        "none. The INTERNET permission is stripped from the built package, so the app " +
+        "cannot reach the network even if a future dependency tried to add it. Check " +
+        "before you install: aapt dump permissions UsernameGenerator-<version>.apk",
     "What stays on your device" to
         "Your settings, meaning the language, the word type, the length, and the digit and " +
         "separator choices, are saved in the app's private storage so they survive a " +
         "restart. Nothing else is written down. Generated names are held in memory and are " +
         "gone when you close the app.",
     "They are not backed up" to
-        "The app sets allowBackup to false, so Android's Auto Backup never copies your " +
-        "settings to your Google account, and adb backup gets nothing either. It also asks " +
-        "Android to exclude them from device-to-device transfer, the one path allowBackup " +
-        "does not govern; Google's own documentation says some manufacturers do not let an " +
-        "app opt out of that migration, so we ask, and cannot promise. Uninstalling " +
-        "removes them.",
+        "The app sets allowBackup=\"false\", so Android's Auto Backup never copies them " +
+        "to your Google account, and adb backup gets nothing either. It also asks Android " +
+        "to exclude them from device-to-device transfer, which is the one path " +
+        "allowBackup does not govern; Google's own documentation says some manufacturers " +
+        "do not let an app opt out of that migration, so we ask, and cannot promise. " +
+        "Uninstalling removes them.",
     "The clipboard" to
         "Copying a name puts it on the system clipboard, which is shared with the rest " +
         "of your device. On Android 13 and later the app marks the clip sensitive, which " +
@@ -55,23 +58,38 @@ private val PRIVACY_SECTIONS = listOf(
     "Word lists" to
         "The word lists for all eleven languages are compiled into the app. There is no download, no " +
         "update check and no server to ask.",
-    "Children" to
-        "The app has no content directed at children, collects nothing from anyone, and " +
-        "never asks anyone's age.",
+    "The web version" to
+        "Static files. No cookies, no local storage (unless you choose the offline option, " +
+        "which keeps a copy of this site on your device so that it opens without a " +
+        "network), no analytics and no third-party scripts or frames. The generator, its " +
+        "fonts and its word lists are served from this site and nowhere else, and " +
+        "everything you generate happens in your browser and stays there.\n\n" +
+        "GitHub Pages stores the site and keeps its own logs; Cloudflare delivers it on " +
+        "our behalf and keeps short-lived logs.\n\n" +
+        "Your data protection rights, and how to complain to Datatilsynet (the Norwegian " +
+        "Data Protection Authority), are set out at stormberry.as/privacy.",
     "Where you got the app" to
         "A copy installed from Google Play is delivered by Google, which applies its own " +
         "logging to the download and the install. That is Google's processing, not ours, " +
-        "and it happens before the app ever runs. The copy from GitHub Releases, " +
-        "Obtainium or Zapstore is not routed through Google at all.",
+        "and it happens before the app ever runs.\n\n" +
+        "The Play listing is a separate package, no.stormberry.usernamegenerator.play, " +
+        "signed under Google's Play App Signing. The copy published on GitHub Releases, " +
+        "Obtainium and Zapstore is no.stormberry.usernamegenerator, signed with our own " +
+        "key, and is not routed through Google at all. Both can be installed at once, and " +
+        "neither can update the other.",
+    "Children" to
+        "The application has no content directed at children, collects nothing from " +
+        "anyone, and never asks anyone's age.",
+    "Changes" to
+        "If any of this changes, the date below changes with it, and the copy shown inside " +
+        "the application changes in the same release.",
     "Who is responsible" to
-        "Stormberry AS, org. nr. 937 751 249, Askøy, Norway. Contact info@stormberry.as. " +
-        "Because nothing is collected there is nothing to request, correct or erase. The " +
-        "full policy, including the web version and the two published packages, is at " +
-        "username.stormberry.as/privacy.html. The separate company policy covering the " +
-        "stormberry.as website and its contact form is at stormberry.as/privacy.html.",
+        "Stormberry AS, org.nr. 937 751 249, Askøy, Norway. Contact: info@stormberry.as\n\n" +
+        "The company policy covering the stormberry.as website and its contact form is a " +
+        "separate document at stormberry.as/privacy.html.",
 )
 
-private const val PRIVACY_UPDATED = "Last updated 3 September 2026."
+private const val PRIVACY_UPDATED = "Last updated 25 October 2026."
 
 @Composable
 fun PrivacyDialog(onDismiss: () -> Unit) {

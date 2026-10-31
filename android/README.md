@@ -66,6 +66,7 @@ Ports the web app's engine exactly, so all three implementations (web, Python CL
 - **Mixed** follows the web app: one word is a noun, two are adjective plus noun, three or more open with a verb, then an adjective, then nouns.
 - Accents are stripped after generation (`condução` becomes `conducao`) so the result is accepted everywhere.
 - Tap the card or the copy icon to copy. Recent generations are kept in memory for the session and are tappable too.
+- The Stormberry Labs carousel above the footer, as on the website, in both editions: each card opens that app's website in your browser, so the app still needs no internet permission.
 
 One deliberate difference from the web version: randomness comes from `SecureRandom` rather than `Math.random()`. People generate usernames to keep identities apart, and a predictable PRNG quietly undermines that.
 
@@ -187,6 +188,7 @@ mapping:
 | `android-v1.1.2` | 1.1.2 (code 5) | not published | n/a: app unchanged, cut so Zapstore offers the refreshed listing |
 | `android-v1.1.3` | 1.1.3 (code 6) | 1.2.1 (code 6) | yes |
 | `android-v1.1.4` | 1.1.4 (code 7) | 1.2.2 (code 7) | yes |
+| `android-v1.1.5` | 1.1.5 (code 8) | 1.2.3 (code 8) | yes |
 
 **Every Play upload is built from a tag that shipped on GitHub Releases.** Never respin Play
 from an untagged tree; bump, tag, and add a row here. Order of operations: bump, tag, let CI

@@ -139,13 +139,17 @@ android {
         // and the website now ships the opt-in offline pilot. Both lines move together because
         // the app itself changed; Play's next code had to be 7 or more, and it is the same code.
         //
+        // Sovereign 1.1.5 (code 8) and Play 1.2.3 (code 8), 2026-10-30: the Stormberry Labs
+        // carousel above the footer, as on the website. Both lines move together because the
+        // app itself changed; Play's next code had to be 8 or more, and it is the same code.
+        //
         // Play 1.2.0 (code 5). Play only requires monotonicity within its own package, so
         // nothing forces the two lines to track each other. What MUST stay true is the
         // mapping, kept in the release table in README.md: every Play upload is built from a
         // sovereign tag that shipped on GitHub Releases, same code, different application ID
         // and different signature. Never respin Play from an untagged tree.
-        versionCode = if (playBuild) 7 else 7
-        versionName = if (playBuild) "1.2.2" else "1.1.4"
+        versionCode = if (playBuild) 8 else 8
+        versionName = if (playBuild) "1.2.3" else "1.1.5"
 
         // No instrumentation tests, no test runner, nothing that pulls in extra permissions.
         // Density-split PNGs are generated at build time from vectors and are a source of

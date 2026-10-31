@@ -69,6 +69,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import no.stormberry.labs.carousel.LabsApp
+import no.stormberry.labs.carousel.LabsCarousel
+import no.stormberry.labs.carousel.LabsCarouselColors
 import no.stormberry.usernamegenerator.Dictionaries
 import no.stormberry.usernamegenerator.DigitPosition
 import no.stormberry.usernamegenerator.R
@@ -358,6 +361,8 @@ fun UsernameGeneratorApp(modifier: Modifier = Modifier) {
 
                 Spacer(Modifier.height(48.dp))
             }
+            // The website's "Explore the Stormberry Ecosystem" carousel, above the footer as there.
+            LabsCarousel(current = LabsApp.USERNAME_GENERATOR, colors = CarouselColors)
             AppFooter(onPrivacy = { showPrivacy = true })
         }
 
@@ -667,3 +672,18 @@ private fun copyToClipboard(context: Context, value: String) {
     }
     manager.setPrimaryClip(clip)
 }
+
+/**
+ * The carousel in this app's colours, the custom properties username.stormberry.as gives its
+ * carousel (footer.css): --text-muted for the heading and the tick box, --glass-bg and
+ * --glass-border for the cards, --accent-3 for the app's own card, --glass-border above it.
+ */
+private val CarouselColors = LabsCarouselColors(
+    title = Stormberry.TextMuted,
+    label = Stormberry.TextMain,
+    cardFill = Stormberry.GlassFill,
+    cardBorder = Stormberry.GlassBorder,
+    accent = Stormberry.AccentSky,
+    rule = Stormberry.GlassBorder,
+    checkmark = Stormberry.Background,
+)
